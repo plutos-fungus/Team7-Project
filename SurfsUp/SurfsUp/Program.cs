@@ -1,4 +1,9 @@
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using SurfsUp.Data;
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddDbContext<SurfsUpContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("SurfsUpContext") ?? throw new InvalidOperationException("Connection string 'SurfsUpContext' not found.")));
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
