@@ -32,3 +32,9 @@ td, th {
 tr:nth-child(even) {
     background-color: #dddddd;
 }
+
+.required-field::after {
+    content: "*";
+    color: red;
+    margin-left: 2px
+}
