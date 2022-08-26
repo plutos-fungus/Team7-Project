@@ -1,8 +1,10 @@
 ﻿namespace SurfsUp.Models
 {
-    public class Type
+    public enum Type
     {
-        public int Id { get; set; }
-        public string? Name { get; set; }
+        Shortboard,
+        Funboard,
+        Fish,
+        SUP
     }
 }

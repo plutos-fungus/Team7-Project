@@ -5,7 +5,7 @@ namespace SurfsUp.Models
     public class Surfboard
     {
         public int ID { get; set; }
-        [DataType(DataType.Text)]
+        //[DataType(DataType.Text)]
         public string? Name { get; set; }
         public Type? BoardType { get; set; }
         public double Length { get; set; }
@@ -13,7 +13,7 @@ namespace SurfsUp.Models
         public double Thickness { get; set; }
         public double Volume { get; set; }
         public double Price { get; set; }
-        public List<Equipment>? EquipmentTypes { get; set; }
+        public string? EquipmentTypes { get; set; }
         public string? Image { get; set; }
     }
 }
