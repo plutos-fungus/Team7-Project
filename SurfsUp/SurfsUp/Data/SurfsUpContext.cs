@@ -15,5 +15,7 @@ namespace SurfsUp.Data
         }
 
         public DbSet<SurfsUp.Models.Surfboard> Surfboard { get; set; } = default!;
+
+        public DbSet<SurfsUp.Models.Rental>? Rental { get; set; }
     }
 }
