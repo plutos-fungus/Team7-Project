@@ -7,10 +7,13 @@ namespace SurfsUp.Models
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Id { get; set; }
+        public int ID { get; set; }
         public DateTime RentalDate { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
         public string Email { get; set; }
+        
+        [ForeignKey("Surfboard")]
+        public int SurfboardID { get; set; }
     }
 }

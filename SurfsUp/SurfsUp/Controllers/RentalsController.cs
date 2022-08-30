@@ -36,7 +36,7 @@ namespace SurfsUp.Controllers
             }
 
             var rental = await _context.Rental
-                .FirstOrDefaultAsync(m => m.Id == id);
+                .FirstOrDefaultAsync(m => m.ID == id);
             if (rental == null)
             {
                 return NotFound();
@@ -56,7 +56,7 @@ namespace SurfsUp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,RentalDate,StartDate,EndDate,Email")] Rental rental)
+        public async Task<IActionResult> Create([Bind("ID,RentalDate,StartDate,EndDate,Email,SurfboardID")] Rental rental)
         {
             if (ModelState.IsValid)
             {
@@ -88,9 +88,9 @@ namespace SurfsUp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,RentalDate,StartDate,EndDate,Email")] Rental rental)
+        public async Task<IActionResult> Edit(int id, [Bind("ID,RentalDate,StartDate,EndDate,Email,SurfboardID")] Rental rental)
         {
-            if (id != rental.Id)
+            if (id != rental.ID)
             {
                 return NotFound();
             }
@@ -104,7 +104,7 @@ namespace SurfsUp.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!RentalExists(rental.Id))
+                    if (!RentalExists(rental.ID))
                     {
                         return NotFound();
                     }
@@ -127,7 +127,7 @@ namespace SurfsUp.Controllers
             }
 
             var rental = await _context.Rental
-                .FirstOrDefaultAsync(m => m.Id == id);
+                .FirstOrDefaultAsync(m => m.ID == id);
             if (rental == null)
             {
                 return NotFound();
@@ -157,7 +157,7 @@ namespace SurfsUp.Controllers
 
         private bool RentalExists(int id)
         {
-          return (_context.Rental?.Any(e => e.Id == id)).GetValueOrDefault();
+          return (_context.Rental?.Any(e => e.ID == id)).GetValueOrDefault();
         }
     }
 }
