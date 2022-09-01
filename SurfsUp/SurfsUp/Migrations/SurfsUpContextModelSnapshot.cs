@@ -56,9 +56,8 @@ namespace SurfsUp.Migrations
                     b.Property<int>("ID")
                         .HasColumnType("int");
 
-                    b.Property<string>("BoardType")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("BoardType")
+                        .HasColumnType("int");
 
                     b.Property<string>("EquipmentTypes")
                         .HasColumnType("nvarchar(max)");

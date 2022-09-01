@@ -5,12 +5,14 @@ namespace SurfsUp.Models
 {
     public class Surfboard
     {
+        public enum BoardTypes { shortboard, longboard, SUP, fish };
+
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int ID { get; set; }
         //[DataType(DataType.Text)]
         public string Name { get; set; }
-        public string BoardType { get; set; }
+        public BoardTypes BoardType { get; set; }
         public double Length { get; set; }
         public double Width { get; set; }
         public double Thickness { get; set; }

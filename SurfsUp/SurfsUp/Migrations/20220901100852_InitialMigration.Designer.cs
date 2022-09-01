@@ -12,8 +12,8 @@ using SurfsUp.Data;
 namespace SurfsUp.Migrations
 {
     [DbContext(typeof(SurfsUpContext))]
-    [Migration("20220830111715_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20220901100852_InitialMigration")]
+    partial class InitialMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -58,9 +58,8 @@ namespace SurfsUp.Migrations
                     b.Property<int>("ID")
                         .HasColumnType("int");
 
-                    b.Property<string>("BoardType")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("BoardType")
+                        .HasColumnType("int");
 
                     b.Property<string>("EquipmentTypes")
                         .HasColumnType("nvarchar(max)");
