@@ -8,9 +8,10 @@ namespace SurfsUp.Models
         public enum BoardTypes { shortboard, longboard, SUP, fish };
 
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.None)]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int ID { get; set; }
         //[DataType(DataType.Text)]
+        [StringLength(255)]
         public string Name { get; set; }
         public BoardTypes BoardType { get; set; }
         public double Length { get; set; }
@@ -18,7 +19,10 @@ namespace SurfsUp.Models
         public double Thickness { get; set; }
         public double Volume { get; set; }
         public double Price { get; set; }
+        [StringLength(50)]
         public string? EquipmentTypes { get; set; }
+        [StringLength(50)]
         public string? Image { get; set; }
+        //public List<Surfboard> surfboard { get; set;  }
     }
 }
