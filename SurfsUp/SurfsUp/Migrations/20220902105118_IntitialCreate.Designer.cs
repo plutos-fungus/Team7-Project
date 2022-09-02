@@ -12,7 +12,7 @@ using SurfsUp.Data;
 namespace SurfsUp.Migrations
 {
     [DbContext(typeof(SurfsUpContext))]
-    [Migration("20220902084717_IntitialCreate")]
+    [Migration("20220902105118_IntitialCreate")]
     partial class IntitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -69,6 +69,9 @@ namespace SurfsUp.Migrations
                     b.Property<string>("Image")
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
+
+                    b.Property<bool>("IsRented")
+                        .HasColumnType("bit");
 
                     b.Property<double>("Length")
                         .HasColumnType("float");

@@ -20,7 +20,7 @@ namespace SurfsUp.Controllers
         public async Task<IActionResult> Index()
         {
             return _context.Surfboard != null ?
-                        View(await _context.Surfboard.ToListAsync()) :
+                        View(await _context.Surfboard.Where(s => s.IsRented == false).ToListAsync()) :
                         Problem("Entity set 'SurfsUpContext.Surfboard'  is null.");
         }
 

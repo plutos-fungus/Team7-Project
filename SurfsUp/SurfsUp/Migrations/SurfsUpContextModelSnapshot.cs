@@ -68,6 +68,9 @@ namespace SurfsUp.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<bool>("IsRented")
+                        .HasColumnType("bit");
+
                     b.Property<double>("Length")
                         .HasColumnType("float");
 

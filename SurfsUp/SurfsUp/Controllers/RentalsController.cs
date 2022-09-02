@@ -13,6 +13,7 @@ namespace SurfsUp.Controllers
     public class RentalsController : Controller
     {
         private readonly SurfsUpContext _context;
+        private int globalId;
 
         public RentalsController(SurfsUpContext context)
         {
@@ -46,9 +47,12 @@ namespace SurfsUp.Controllers
         }
 
         // GET: Rentals/Create
-        public IActionResult Create()
+        public IActionResult Create(int id)
         {
-            return View();
+            Rental r = new();
+            r.SurfboardID = id;
+            globalId = id;
+            return View(r);
         }
 
         // POST: Rentals/Create
@@ -60,6 +64,15 @@ namespace SurfsUp.Controllers
         {
             if (ModelState.IsValid)
             {
+                var rented = _context.Surfboard.Where(s => s.ID == rental.SurfboardID).ToList();
+                            // from Surfboard in _context.Surfboard
+                            // where Surfboard.ID == globalId
+                            // select Surfboard;
+                foreach (Surfboard surfboard in rented)
+                {
+                    surfboard.IsRented = true;
+                    _context.Update(surfboard);
+                }
                 _context.Add(rental);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));

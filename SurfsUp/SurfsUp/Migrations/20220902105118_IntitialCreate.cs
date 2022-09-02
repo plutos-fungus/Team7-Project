@@ -39,7 +39,8 @@ namespace SurfsUp.Migrations
                     Volume = table.Column<double>(type: "float", nullable: false),
                     Price = table.Column<double>(type: "float", nullable: false),
                     EquipmentTypes = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    Image = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true)
+                    Image = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    IsRented = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {

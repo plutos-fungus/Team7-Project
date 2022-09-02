@@ -43,39 +43,39 @@
         <tbody>
             @foreach (var item in Model)
             {
-                <tr>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Name)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.BoardType)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Length)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Width)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Thickness)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Volume)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Price)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.EquipmentTypes)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Image)
-                    </td>
-                    <td>
-                        <a href="@Url.Action("Create", "Rentals", new { id = item.ID})">Rent</a> |
-                        <a href="@Url.Action("Details", "Surfboards", new { id = item.ID})">Details</a>
-                    </td>
-                </tr>
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Name)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.BoardType)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Length)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Width)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Thickness)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Volume)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Price)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.EquipmentTypes)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Image)
+                        </td>
+                        <td>
+                            <a href="@Url.Action("Create", "Rentals", new { id = item.ID})">Rent</a> |
+                            <a href="@Url.Action("Details", "Surfboards", new { id = item.ID})">Details</a>
+                        </td>
+                    </tr>
             }
         </tbody>
     </table>

@@ -24,6 +24,7 @@ namespace SurfsUp.Models
         public string? EquipmentTypes { get; set; }
         [StringLength(50)]
         public string? Image { get; set; }
+        public bool IsRented { get; set; }
     }
 
     //public class SurfDBContext : DbContext
