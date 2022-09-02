@@ -12,8 +12,8 @@ using SurfsUp.Data;
 namespace SurfsUp.Migrations
 {
     [DbContext(typeof(SurfsUpContext))]
-    [Migration("20220902075252_InitialCreation")]
-    partial class InitialCreation
+    [Migration("20220902084717_IntitialCreate")]
+    partial class IntitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -27,10 +27,7 @@ namespace SurfsUp.Migrations
             modelBuilder.Entity("SurfsUp.Models.Rental", b =>
                 {
                     b.Property<int>("ID")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"), 1L, 1);
 
                     b.Property<string>("Email")
                         .IsRequired()

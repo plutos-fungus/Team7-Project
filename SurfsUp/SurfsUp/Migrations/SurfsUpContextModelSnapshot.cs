@@ -25,10 +25,7 @@ namespace SurfsUp.Migrations
             modelBuilder.Entity("SurfsUp.Models.Rental", b =>
                 {
                     b.Property<int>("ID")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"), 1L, 1);
 
                     b.Property<string>("Email")
                         .IsRequired()

@@ -6,7 +6,7 @@ namespace SurfsUp.Models
     public class Rental
     {
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int ID { get; set; }
         public DateTime RentalDate { get; set; }
         public DateTime StartDate { get; set; }

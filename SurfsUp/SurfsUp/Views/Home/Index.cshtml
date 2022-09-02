@@ -72,8 +72,8 @@
                         @Html.DisplayFor(modelItem => item.Image)
                     </td>
                     <td>
-                        <a asp-action="Rentals" asp-route-id="@item.ID">Rent</a> |
-                        <a asp-action="Details" asp-route-id="@item.ID">Details</a> |
+                        <a href="@Url.Action("Create", "Rentals", new { id = item.ID})">Rent</a> |
+                        <a href="@Url.Action("Details", "Surfboards", new { id = item.ID})">Details</a>
                     </td>
                 </tr>
             }
