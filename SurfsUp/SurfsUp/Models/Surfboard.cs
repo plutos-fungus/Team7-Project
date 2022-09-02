@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SurfsUp.Models
@@ -23,6 +24,12 @@ namespace SurfsUp.Models
         public string? EquipmentTypes { get; set; }
         [StringLength(50)]
         public string? Image { get; set; }
-        //public List<Surfboard> surfboard { get; set;  }
     }
+
+    //public class SurfDBContext : DbContext
+    //{
+    //    public SurfDBContext()
+    //    {}
+    //    public DbSet<Surfboard> surfboards { get; set; }
+    //}
 }
