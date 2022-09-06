@@ -134,6 +134,7 @@ namespace SurfsUp.Controllers
         // GET: Rentals/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
+           
             if (id == null || _context.Rental == null)
             {
                 return NotFound();
@@ -145,7 +146,21 @@ namespace SurfsUp.Controllers
             {
                 return NotFound();
             }
-
+            var rented = _context.Surfboard.Where(s => s.ID == rental.SurfboardID).ToList();
+            // from Surfboard in _context.Surfboard
+            // where Surfboard.ID == globalId
+            // select Surfboard;
+            foreach (Surfboard surfboard in rented)
+            {
+                surfboard.IsRented = false;
+                _context.Update(surfboard);
+            }
+            await _context.SaveChangesAsync();
+            _context.Add(rental);
+            if (id == null || _context.Rental == null)
+            {
+                return NotFound();
+            }
             return View(rental);
         }
 
