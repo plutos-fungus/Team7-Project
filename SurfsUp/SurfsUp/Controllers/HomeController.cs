@@ -3,6 +3,7 @@ using SurfsUp.Models;
 using SurfsUp.Data;
 using System.Diagnostics;
 using Microsoft.EntityFrameworkCore;
+using System.Runtime.Loader;
 
 namespace SurfsUp.Controllers
 {
@@ -19,6 +20,7 @@ namespace SurfsUp.Controllers
 
         public async Task<IActionResult> Index()
         {
+            CheckAndDelete();
             return _context.Surfboard != null ?
                         View(await _context.Surfboard.Where(s => s.IsRented == false).ToListAsync()) :
                         Problem("Entity set 'SurfsUpContext.Surfboard'  is null.");
@@ -34,5 +36,30 @@ namespace SurfsUp.Controllers
         //{
         //    return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         //}
+        public void CheckAndDelete()
+        {
+            DateTime nowDate = DateTime.Now;
+            var rentCheck = _context.Rental.ToList();
+            var allSurfboards = _context.Surfboard.Where(s => s.IsRented == true).ToList();
+
+            foreach (Rental rental in rentCheck)
+            {
+                if (rental.EndDate <= nowDate)
+                {
+                    foreach (Surfboard surfboard in allSurfboards)
+                    {
+                        if (rental.SurfboardID == surfboard.ID)
+                        {
+                            surfboard.IsRented = false;
+                            _context.Surfboard.Update(surfboard);
+                            _context.Rental.Remove(rental);
+                        }
+                    }
+                    //Update Rental.SurfboardId
+                    _context.SaveChanges();
+                }
+
+            }
+        }
     }
 }
