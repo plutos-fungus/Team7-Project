@@ -12,10 +12,10 @@ namespace SurfsUp.Controllers
 {
     public class RentalsController : Controller
     {
-        private readonly SurfsUpContext _context;
+        private readonly ApplicationDbContext _context;
         private int globalId;
 
-        public RentalsController(SurfsUpContext context)
+        public RentalsController(ApplicationDbContext context)
         {
             _context = context;
         }
@@ -23,9 +23,9 @@ namespace SurfsUp.Controllers
         // GET: Rentals
         public async Task<IActionResult> Index()
         {
-              return _context.Rental != null ? 
-                          View(await _context.Rental.ToListAsync()) :
-                          Problem("Entity set 'SurfsUpContext.Rental'  is null.");
+            return _context.Rental != null ?
+                        View(await _context.Rental.ToListAsync()) :
+                        Problem("Entity set 'SurfsUpContext.Rental'  is null.");
         }
 
         // GET: Rentals/Details/5
@@ -65,9 +65,9 @@ namespace SurfsUp.Controllers
             if (ModelState.IsValid)
             {
                 var rented = _context.Surfboard.Where(s => s.ID == rental.SurfboardID).ToList();
-                            // from Surfboard in _context.Surfboard
-                            // where Surfboard.ID == globalId
-                            // select Surfboard;
+                // from Surfboard in _context.Surfboard
+                // where Surfboard.ID == globalId
+                // select Surfboard;
                 foreach (Surfboard surfboard in rented)
                 {
                     surfboard.IsRented = true;
@@ -134,7 +134,7 @@ namespace SurfsUp.Controllers
         // GET: Rentals/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-           
+
             if (id == null || _context.Rental == null)
             {
                 return NotFound();
@@ -178,14 +178,14 @@ namespace SurfsUp.Controllers
             {
                 _context.Rental.Remove(rental);
             }
-            
+
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool RentalExists(int id)
         {
-          return (_context.Rental?.Any(e => e.ID == id)).GetValueOrDefault();
+            return (_context.Rental?.Any(e => e.ID == id)).GetValueOrDefault();
         }
     }
 }

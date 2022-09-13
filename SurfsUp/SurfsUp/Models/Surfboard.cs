@@ -6,7 +6,7 @@ namespace SurfsUp.Models
 {
     public class Surfboard
     {
-        public enum BoardTypes { fish, funboard, longboard, shortboard, SUP};
+        public enum BoardTypes { shortboard, funboard, longboard, SUP, fish };
 
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]

@@ -11,8 +11,8 @@
         <form asp-action="Index" method="get">
             <div class="form-actions no-color">
                 <p>
-                    <input type="submit" value="Search" class="btn btn-default" style="float: right;"/>
-                    Find by name: <input type="text" name="SearchString" value="@ViewData["CurrentFilter"]" style="float: right;"  /> |
+                    <input type="submit" value="Search" class="btn btn-default" style="float: right;" />
+                    Find by name: <input type="text" name="SearchString" value="@ViewData["CurrentFilter"]" style="float: right;" /> |
                     <a asp-action="Index">Back to Full List</a>
                 </p>
             </div>
@@ -34,7 +34,7 @@
                 <input class="form-control" />
             </div>
             <br />
-            <select style="width: 100%"> 
+            <select style="width: 100%">
                 Sort by Price
                 <option value="PDefault">Sort by price</option>
                 <option value="Ascending"><a asp-action="Index" asp-route-SortOrder="@ViewData["PriceSortParm"]"></a>Ascending</option>
@@ -44,13 +44,13 @@
         <div>
             @*<h5>Boardtype</h5>
             <div class="form-group">
-                <select style="width: 100%" asp-items="@Html.GetEnumSelectList<Surfboard.BoardTypes>()">
-                    <option value="SBDefault">Boardtype</option>
-                </select>
-                @*<span asp-validation-for="BoardType" class="text-danger"></span>
+            <select style="width: 100%" asp-items="@Html.GetEnumSelectList<Surfboard.BoardTypes>()">
+            <option value="SBDefault">Boardtype</option>
+            </select>
+            @*<span asp-validation-for="BoardType" class="text-danger"></span>
             </div>*@
         </div>
-                
+
     </div>
     <div class="col-10">
         <div class="text-center">
@@ -77,7 +77,7 @@
                             Volume
                         </th>
                         <th>
-                            <a asp-action="Index" asp-route-SortOrder="@ViewData["PriceSortParm"]"asp-route-currentFilter="@ViewData["CurrentFilter"]">Price</a>
+                            <a asp-action="Index" asp-route-SortOrder="@ViewData["PriceSortParm"]" asp-route-currentFilter="@ViewData["CurrentFilter"]">Price</a>
                         </th>
                         <th>
                             EquipmentTypes

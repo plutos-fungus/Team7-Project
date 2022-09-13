@@ -34,7 +34,7 @@
             </div>
             <div class="form-group" hidden>
                 <label asp-for="SurfboardID" class="control-label"></label>
-                <input asp-for="SurfboardID" class="form-control"/>
+                <input asp-for="SurfboardID" class="form-control" />
                 <span asp-validation-for="SurfboardID" class="text-danger"></span>
             </div>
             <div class="form-group">
@@ -49,5 +49,7 @@
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    }

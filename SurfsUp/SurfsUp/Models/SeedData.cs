@@ -8,9 +8,9 @@ namespace SurfsUp.Models
     {
         public static void Initialize(IServiceProvider serviceProvider)
         {
-            using (var context = new SurfsUpContext(
+            using (var context = new ApplicationDbContext(
                 serviceProvider.GetRequiredService<
-                    DbContextOptions<SurfsUpContext>>()))
+                    DbContextOptions<ApplicationDbContext>>()))
             {
                 // Look for any movies.
                 if (context.Surfboard.Any())

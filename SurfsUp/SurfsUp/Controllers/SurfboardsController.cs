@@ -12,9 +12,9 @@ namespace SurfsUp.Controllers
 {
     public class SurfboardsController : Controller
     {
-        private readonly SurfsUpContext _context;
+        private readonly ApplicationDbContext _context;
 
-        public SurfboardsController(SurfsUpContext context)
+        public SurfboardsController(ApplicationDbContext context)
         {
             _context = context;
         }
@@ -150,14 +150,14 @@ namespace SurfsUp.Controllers
             {
                 _context.Surfboard.Remove(surfboard);
             }
-            
+
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool SurfboardExists(int id)
         {
-          return (_context.Surfboard?.Any(e => e.ID == id)).GetValueOrDefault();
+            return (_context.Surfboard?.Any(e => e.ID == id)).GetValueOrDefault();
         }
     }
 }
