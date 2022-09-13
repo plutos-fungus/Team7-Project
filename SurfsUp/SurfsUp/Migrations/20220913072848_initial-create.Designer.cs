@@ -12,7 +12,7 @@ using SurfsUp.Data;
 namespace SurfsUp.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20220913070629_initial-create")]
+    [Migration("20220913072848_initial-create")]
     partial class initialcreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

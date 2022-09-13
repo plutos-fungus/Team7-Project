@@ -16,3 +16,9 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+.required-field::after {
+    content: "*";
+    color: red;
+    margin-left: 2px;
+}
