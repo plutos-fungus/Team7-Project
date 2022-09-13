@@ -64,7 +64,7 @@
                         <th>
                             <a asp-action="Index" asp-route-SortOrder="@ViewData["BoardTypeSortParm"]" asp-route-currentFilter="@ViewData["CurrentFilter"]">BoardType</a>
                         </th>
-                        <th>
+                        @*<th>
                             Length
                         </th>
                         <th>
@@ -75,13 +75,13 @@
                         </th>
                         <th>
                             Volume
-                        </th>
+                        </th>*@
                         <th>
                             <a asp-action="Index" asp-route-SortOrder="@ViewData["PriceSortParm"]" asp-route-currentFilter="@ViewData["CurrentFilter"]">Price</a>
                         </th>
-                        <th>
+                        @*<th>
                             EquipmentTypes
-                        </th>
+                        </th>*@
                         <th>
                             Image
                         </th>
@@ -98,7 +98,7 @@
                             <td>
                                 @Html.DisplayFor(modelItem => item.BoardType)
                             </td>
-                            <td>
+                            @*<td>
                                 @Html.DisplayFor(modelItem => item.Length)
                             </td>
                             <td>
@@ -109,15 +109,21 @@
                             </td>
                             <td>
                                 @Html.DisplayFor(modelItem => item.Volume)
-                            </td>
+                            </td>*@
                             <td>
                                 @Html.DisplayFor(modelItem => item.Price)
                             </td>
-                            <td>
+                            @*<td>
                                 @Html.DisplayFor(modelItem => item.EquipmentTypes)
-                            </td>
+                            </td>*@
                             <td>
-                                @Html.DisplayFor(modelItem => item.Image)
+                                @*@Html.DisplayFor(modelItem => item.Image)*@
+                                @*<img src="/Images/MahiMahi.png" style="width: 150px"/>*@
+                                @if(item.Image != ""){
+                                    string s = Url.Content(item.Image);
+                                    <img src="@s" style="width: 150px" alt="ImageNotFound"/>
+                                }
+                                
                             </td>
                             <td>
                                 <a href="@Url.Action("Create", "Rentals", new { id = item.ID})">Rent</a> |

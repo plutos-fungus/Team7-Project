@@ -27,7 +27,8 @@ namespace SurfsUp.Models
                         Width = 10,
                         Thickness = 2,
                         Volume = 100,
-                        Price = 400
+                        Price = 400,
+                        Image = "/Images/boof.png"
                     },
                     new Surfboard
                     {
@@ -37,7 +38,8 @@ namespace SurfsUp.Models
                         Width = 21,
                         Thickness = 2.75,
                         Volume = 38.8,
-                        Price = 565
+                        Price = 565,
+                        Image = "/Images/Minilog.png"
                     },
                     new Surfboard
                     {
@@ -47,7 +49,8 @@ namespace SurfsUp.Models
                         Width = 21.75,
                         Thickness = 2.75,
                         Volume = 44.16,
-                        Price = 685
+                        Price = 685,
+                        Image = "/Images/WideGlider.png"
                     },
                     new Surfboard
                     {
@@ -57,7 +60,8 @@ namespace SurfsUp.Models
                         Width = 21.85,
                         Thickness = 2.9,
                         Volume = 43.22,
-                        Price = 695
+                        Price = 695,
+                        Image = "/Images/GoldenRatio.png"
                     },
                     new Surfboard
                     {
@@ -67,7 +71,8 @@ namespace SurfsUp.Models
                         Width = 20.75,
                         Thickness = 2.3,
                         Volume = 29.39,
-                        Price = 645
+                        Price = 645,
+                        Image = "/Images/MahiMahi.png"
                     },
                     new Surfboard
                     {
@@ -77,7 +82,8 @@ namespace SurfsUp.Models
                         Width = 22.8,
                         Thickness = 2.8,
                         Volume = 65.4,
-                        Price = 895
+                        Price = 895,
+                        Image = "/Images/EmeraldGlider.png"
                     },
                     new Surfboard
                     {
@@ -87,7 +93,8 @@ namespace SurfsUp.Models
                         Width = 21,
                         Thickness = 2.5,
                         Volume = 33.7,
-                        Price = 645
+                        Price = 645,
+                        Image = "/Images/TheBomb.png"
                     },
                     new Surfboard
                     {
@@ -97,7 +104,8 @@ namespace SurfsUp.Models
                         Width = 19.4,
                         Thickness = 3,
                         Volume = 80,
-                        Price = 1025
+                        Price = 1025,
+                        Image = "/Images/WaldenMagic.png"
                     },
                     new Surfboard
                     {
@@ -108,7 +116,8 @@ namespace SurfsUp.Models
                         Thickness = 6,
                         Volume = 301,
                         Price = 854,
-                        EquipmentTypes = "Paddle"
+                        EquipmentTypes = "Paddle",
+                        Image = "/Images/NaishOne.jpg"
                     },
                     new Surfboard
                     {
@@ -119,7 +128,8 @@ namespace SurfsUp.Models
                         Thickness = 6,
                         Volume = 270,
                         Price = 611,
-                        EquipmentTypes = "Fin, Paddle, Pump, Leash"
+                        EquipmentTypes = "Fin, Paddle, Pump, Leash",
+                        Image = "/Images/STXTourer.jpg"
                     },
                     new Surfboard
                     {
@@ -130,7 +140,8 @@ namespace SurfsUp.Models
                         Thickness = 6,
                         Volume = 330,
                         Price = 1304,
-                        EquipmentTypes = "Fin, Paddle, Pump, Leash"
+                        EquipmentTypes = "Fin, Paddle, Pump, Leash",
+                        Image = "/Images/NaishMaliko.jpg"
                     }
                 );
                 context.SaveChanges();
