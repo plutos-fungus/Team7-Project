@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using SurfsUp.Models;
 
-namespace SurfsUp.Data
+namespace SurfsUp.Areas.Identity.Data
 {
     public class ApplicationDbContext : IdentityDbContext
     {

@@ -1,19 +1,86 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using SurfsUp.Data;
+using SurfsUp.Areas.Identity.Data;
+using System;
+using System.Security.Cryptography.X509Certificates;
 
 namespace SurfsUp.Models
 {
+
     public static class SeedData
     {
-        public static void Initialize(IServiceProvider serviceProvider)
+       
+        public async static Task Initialize(IServiceProvider serviceProvider)
         {
             using (var context = new ApplicationDbContext(
                 serviceProvider.GetRequiredService<
                     DbContextOptions<ApplicationDbContext>>()))
             {
+
+                //Sætter "roleManager" variable til typen "RoleManager" med type parameter af "IdentityRole"
+                var roleManager = serviceProvider
+                .GetRequiredService<RoleManager<IdentityRole>>();
+                var roleName = "Admin";
+                IdentityResult result;
+
+                //checker om "roleManager" har en existerende "Admin" bruger
+                bool roleExist = await roleManager.RoleExistsAsync(roleName);
+
+                if (!roleExist)
+                {
+                    //Ópretter en ny admin bruger, hvis ingen bruger har en admin rolle. 
+                    result = await roleManager
+                    .CreateAsync(new IdentityRole(roleName));
+                    if (result.Succeeded)
+                    {
+                        var userManager = serviceProvider
+                            .GetRequiredService<UserManager<IdentityUser>>();
+                        var config = serviceProvider
+                            .GetRequiredService<IConfiguration>();
+                        var admin = await userManager
+                            .FindByEmailAsync(config["AdminCredentials:Email"]);
+
+                        if (admin == null)
+                        {
+                            admin = new IdentityUser()
+                            {
+                                UserName = config["AdminCredentials:Email"],
+                                Email = config["AdminCredentials:Email"],
+                                EmailConfirmed = true
+                            };
+                            result = await userManager
+                                .CreateAsync(admin, config["AdminCredentials:Password"]);
+                            if (result.Succeeded)
+                            {
+                                result = await userManager
+                                    .AddToRoleAsync(admin, roleName);
+                                if (!result.Succeeded)
+                                {
+                                    // todo: process errors
+                                }
+                            }
+                        }
+                        var user = await userManager
+                           .FindByEmailAsync("test@test.dk");
+                        if (user == null)
+                        {
+                            user = new IdentityUser()
+                            {
+                                UserName = "test@test.dk",
+                                Email = "test@test.dk",
+                                EmailConfirmed = true
+                            };
+                            result = await userManager
+                                .CreateAsync(user, "Test12345!");
+                        }
+                    }
+                }
+
+                
+
                 // Look for any movies.
-                if (context.Surfboard.Any())
+                else if (context.Surfboard.Any())
                 {
                     return;   // DB has been seeded
                 }
@@ -146,6 +213,8 @@ namespace SurfsUp.Models
                 );
                 context.SaveChanges();
             }
+
+
         }
     }
 }

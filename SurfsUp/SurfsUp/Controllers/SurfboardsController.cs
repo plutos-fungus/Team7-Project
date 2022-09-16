@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using SurfsUp.Data;
+using SurfsUp.Areas.Identity.Data;
 using SurfsUp.Models;
 
 namespace SurfsUp.Controllers
@@ -20,6 +21,7 @@ namespace SurfsUp.Controllers
         }
 
         // GET: Surfboards
+        [Authorize(Policy = "RequiredAdminRole")]
         public async Task<IActionResult> Index()
         {
             return _context.Surfboard != null ?
@@ -45,6 +47,8 @@ namespace SurfsUp.Controllers
             return View(surfboard);
         }
 
+        [Authorize(Policy = "RequiredAdminRole")]
+
         // GET: Surfboards/Create
         public IActionResult Create()
         {
@@ -54,6 +58,7 @@ namespace SurfsUp.Controllers
         // POST: Surfboards/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Authorize(Policy = "RequiredAdminRole")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("ID,Name,BoardType,Length,Width,Thickness,Volume,Price,EquipmentTypes,Image")] Surfboard surfboard)

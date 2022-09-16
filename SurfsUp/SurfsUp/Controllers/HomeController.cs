@@ -1,11 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SurfsUp.Models;
-using SurfsUp.Data;
 using System.Diagnostics;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Data.SqlClient;
 using SurfsUp;
 using System.Runtime.Loader;
+using SurfsUp.Areas.Identity.Data;
+using Microsoft.AspNetCore.Identity;
 
 namespace SurfsUp.Controllers
 {
@@ -13,11 +14,16 @@ namespace SurfsUp.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly ApplicationDbContext _context;
+        private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly UserManager<IdentityUser> _userManager;
 
-        public HomeController(ILogger<HomeController> logger, ApplicationDbContext context)
+        public HomeController(ILogger<HomeController> logger, ApplicationDbContext context, RoleManager<IdentityRole> roleManager, UserManager<IdentityUser> userManager)
         {
             _logger = logger;
             _context = context;
+            _roleManager = roleManager;
+            _userManager = userManager;
+
         }
 
         /*public async Task<IActionResult> Index()
