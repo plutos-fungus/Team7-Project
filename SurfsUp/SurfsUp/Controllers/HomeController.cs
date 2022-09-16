@@ -81,7 +81,22 @@ namespace SurfsUp.Controllers
         {
             return View();
         }
+        public async Task<IActionResult> Details(int? id)
+        {
+            if (id == null || _context.Surfboard == null)
+            {
+                return NotFound();
+            }
 
+            var surfboard = await _context.Surfboard
+                .FirstOrDefaultAsync(m => m.ID == id);
+            if (surfboard == null)
+            {
+                return NotFound();
+            }
+
+            return View(surfboard);
+        }
         //[ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         //public IActionResult Error()
         //{

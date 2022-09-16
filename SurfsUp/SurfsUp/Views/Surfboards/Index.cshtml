@@ -71,7 +71,11 @@
                     @Html.DisplayFor(modelItem => item.EquipmentTypes)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Image)
+                    @if (item.Image != "")
+                    {
+                        string s = Url.Content(item.Image);
+                        <img src="@s" style="width: 150px" alt="ImageNotFound" />
+                    }
                 </td>
                 <td>
                     <a asp-action="Edit" asp-route-id="@item.ID">Edit</a> |
