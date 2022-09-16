@@ -1,12 +1,16 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using SurfsUp.Data;
+using SurfsUp.Areas.Identity.Data;
+using System;
+using System.Security.Cryptography.X509Certificates;
 
 namespace SurfsUp.Models
 {
+
     public static class SeedData
     {
+       
         public async static Task Initialize(IServiceProvider serviceProvider)
         {
             using (var context = new ApplicationDbContext(
@@ -17,8 +21,6 @@ namespace SurfsUp.Models
                 //Sætter "roleManager" variable til typen "RoleManager" med type parameter af "IdentityRole"
                 var roleManager = serviceProvider
                 .GetRequiredService<RoleManager<IdentityRole>>();
-                System.Diagnostics.Debug.WriteLine(roleManager);
-                System.Diagnostics.Debug.WriteLine("aaaaaaaaaaaaaaaaaaaAAAAAAAAAAAAAAAAaaaaaaaaaaaa");
                 var roleName = "Admin";
                 IdentityResult result;
 
@@ -43,12 +45,12 @@ namespace SurfsUp.Models
                         {
                             admin = new IdentityUser()
                             {
-                                UserName = config["AdminCredentials:admin@admin.dk"],
-                                Email = config["AdminCredentials:admin@admin.dk"],
+                                UserName = config["AdminCredentials:Email"],
+                                Email = config["AdminCredentials:Email"],
                                 EmailConfirmed = true
                             };
                             result = await userManager
-                                .CreateAsync(admin, config["AdminCredentials:!Admin1234"]);
+                                .CreateAsync(admin, config["AdminCredentials:Password"]);
                             if (result.Succeeded)
                             {
                                 result = await userManager
@@ -59,9 +61,23 @@ namespace SurfsUp.Models
                                 }
                             }
                         }
+                        var user = await userManager
+                           .FindByEmailAsync("test@test.dk");
+                        if (user == null)
+                        {
+                            user = new IdentityUser()
+                            {
+                                UserName = "test@test.dk",
+                                Email = "test@test.dk",
+                                EmailConfirmed = true
+                            };
+                            result = await userManager
+                                .CreateAsync(user, "Test12345!");
+                        }
                     }
                 }
 
+                
 
                 // Look for any movies.
                 else if (context.Surfboard.Any())
@@ -186,6 +202,8 @@ namespace SurfsUp.Models
                 );
                 context.SaveChanges();
             }
+
+
         }
     }
 }
