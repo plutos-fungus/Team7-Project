@@ -10,7 +10,7 @@
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light border-bottom box-shadow mb-3" style="background-color: #035AA6">
             <div class="container-fluid">
                 @*<a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">SurfsUp</a>*@
                 <a asp-controller="Home" asp-action="Index">
@@ -23,13 +23,13 @@
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                            <a style="font-size: 20px"  class="nav-link text-light" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Surfboards" asp-action="Index">Admin</a>
+                            <a style="font-size: 20px" class="nav-link text-light" asp-area="" asp-controller="Surfboards" asp-action="Index">Admin</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Rentals" asp-action="Index">Rentals</a>
+                            <a style="font-size: 20px" class="nav-link text-light" asp-area="" asp-controller="Rentals" asp-action="Index">Rentals</a>
                         </li>
                     </ul>
                     <partial name="_LoginPartial" />

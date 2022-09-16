@@ -62,17 +62,21 @@
             @Html.DisplayNameFor(model => model.Image)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Image)
+            @if (Model.Image != "")
+            {
+                string s = Url.Content(Model.Image);
+                <img src="@s" style="width: 150px" alt="ImageNotFound" />
+            }
         </dd>
-        <dt class = "col-sm-2">
+        @*<dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.ID)
         </dt>
         <dd class = "col-sm-10">
             @Html.DisplayFor(model => model.ID)
-        </dd>
+        </dd>*@
     </dl>
 </div>
 <div>
-    @*<a href="@Url.Action("Create", "Rentals", new {id = model.ID})">Rent</a> |*@
+    <a href="@Url.Action("Create", "Rentals", new { id = Model.ID})">Rent</a> |
     <a asp-action="Index">Back to List</a>
 </div>
