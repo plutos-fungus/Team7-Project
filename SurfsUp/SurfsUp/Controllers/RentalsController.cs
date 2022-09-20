@@ -23,6 +23,7 @@ namespace SurfsUp.Controllers
         }
 
         // GET: Rentals
+        [Authorize(Policy = "RequiredAdminRole")]
         public async Task<IActionResult> Index()
         {
             return _context.Rental != null ?
@@ -77,9 +78,9 @@ namespace SurfsUp.Controllers
                 }
                 _context.Add(rental);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return Redirect("/Home/Index");
             }
-            return View(rental);
+            return Redirect("/Home/Index");
         }
 
         // GET: Rentals/Edit/5
