@@ -28,7 +28,7 @@ namespace SurfsUp.Controllers
         }
 
         // GET: Rentals
-        [Authorize(Policy = "RequiredAdminRole")]
+        
         public async Task<IActionResult> Index()
         {
             if (!this.User.IsInRole("Admin"))

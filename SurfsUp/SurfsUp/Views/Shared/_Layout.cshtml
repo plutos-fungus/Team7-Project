@@ -25,12 +25,15 @@
                         <li class="nav-item">
                             <a style="font-size: 20px"  class="nav-link text-light" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
-                        @if (User.Identity.IsAuthenticated)
+                        @if (this.User.IsInRole("Admin"))
                         {
                             <li class="nav-item">
                                 <a style="font-size: 20px" class="nav-link text-light" asp-area="" asp-controller="Surfboards" asp-action="Index">Admin</a>
                             </li>
 
+                        }
+                        @if (User.Identity.IsAuthenticated)
+                        {
                             <li class="nav-item">
                                 <a style="font-size: 20px" class="nav-link text-light" asp-area="" asp-controller="Rentals" asp-action="Index">Rentals</a>
                             </li>
