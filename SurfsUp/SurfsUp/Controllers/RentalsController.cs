@@ -4,6 +4,7 @@ using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -16,16 +17,29 @@ namespace SurfsUp.Controllers
     {
         private readonly ApplicationDbContext _context;
         private int globalId;
+        private readonly UserManager<IdentityUser> _userManager;
+        private readonly SignInManager<IdentityUser> _signInManager;
 
-        public RentalsController(ApplicationDbContext context)
+        public RentalsController(ApplicationDbContext context, SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager)
         {
             _context = context;
+            _signInManager = signInManager;
+            _userManager = userManager;
         }
 
         // GET: Rentals
         [Authorize(Policy = "RequiredAdminRole")]
         public async Task<IActionResult> Index()
         {
+            if (!this.User.IsInRole("Admin"))
+            {
+                var usr = await _userManager.GetUserAsync(HttpContext.User);
+                var Rentals = from r in _context.Rental
+                              where r.Email == usr.Email
+                              select r;
+                return View(await Rentals.ToListAsync());
+            }
+
             return _context.Rental != null ?
                         View(await _context.Rental.ToListAsync()) :
                         Problem("Entity set 'SurfsUpContext.Rental'  is null.");
