@@ -8,8 +8,12 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using SurfsUp.Areas.Identity.Data;
 using SurfsUp.Models;
+using System.Text.Json;
+using System.Net.Http.Headers;
+using System.Net.Http;
 
 namespace SurfsUp.Controllers
 {
@@ -19,6 +23,7 @@ namespace SurfsUp.Controllers
         private int globalId;
         private readonly UserManager<IdentityUser> _userManager;
         private readonly SignInManager<IdentityUser> _signInManager;
+        
 
         public RentalsController(ApplicationDbContext context, SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager)
         {
@@ -31,13 +36,31 @@ namespace SurfsUp.Controllers
         
         public async Task<IActionResult> Index()
         {
-            if (!this.User.IsInRole("Admin"))
+            HttpClient client = new HttpClient();
+            using HttpResponseMessage response = await client.GetAsync("https://localhost:7059/Rentals/");
+            response.EnsureSuccessStatusCode();
+
+            var jsonRespone = await response.Content.ReadAsStringAsync();
+            
+            var rental =
+                System.Text.Json.JsonSerializer.Deserialize<List<Rental>>(jsonRespone);
+
+            if (!this.User.IsInRole("Admin") && rental != null)
             {
                 var usr = await _userManager.GetUserAsync(HttpContext.User);
-                var Rentals = from r in _context.Rental
-                              where r.Email == usr.Email
-                              select r;
-                return View(await Rentals.ToListAsync());
+
+                List<Rental> Rentals = new List<Rental>();
+                foreach (Rental valueA in rental)
+                {
+                    if (valueA.Email == usr.Email)
+                    {
+                        Rentals.Add(valueA);
+                    }
+                }
+                //var Rentals = from r in _context.Rental
+                //              where r.Email == usr.Email
+                //              select r;
+                return View(Rentals);
             }
 
             return _context.Rental != null ?
@@ -79,6 +102,17 @@ namespace SurfsUp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("ID,RentalDate,StartDate,EndDate,Email,SurfboardID")] Rental rental)
         {
+            HttpClient client = new HttpClient();
+            var jsonString = JsonConvert.SerializeObject(rental);
+            HttpContent content = new StringContent(jsonString);
+            content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+            using HttpResponseMessage response = await client.PostAsync("https://localhost:7059/Rentals", content);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                return NotFound();
+            }
+
             if (ModelState.IsValid)
             {
                 var rented = _context.Surfboard.Where(s => s.ID == rental.SurfboardID).ToList();
@@ -120,6 +154,17 @@ namespace SurfsUp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("ID,RentalDate,StartDate,EndDate,Email,SurfboardID")] Rental rental)
         {
+            HttpClient client = new HttpClient();
+            var jsonString = JsonConvert.SerializeObject(rental);
+            HttpContent content = new StringContent(jsonString);
+            content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+            using HttpResponseMessage response = await client.PutAsync("https://localhost:7059/Rental/", content);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                return NotFound();
+            }
+
             if (id != rental.ID)
             {
                 return NotFound();
@@ -151,6 +196,12 @@ namespace SurfsUp.Controllers
         // GET: Rentals/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
+            HttpClient client = new HttpClient();
+            using HttpResponseMessage response = await client.DeleteAsync("https://localhost:7059/Rental/"+id);
+            if (!response.IsSuccessStatusCode)
+            {
+                return NotFound();
+            }
 
             if (id == null || _context.Rental == null)
             {
