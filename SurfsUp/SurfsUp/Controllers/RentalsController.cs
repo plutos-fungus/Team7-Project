@@ -37,9 +37,9 @@ namespace SurfsUp.Controllers
         public async Task<IActionResult> Index()
         {
             HttpClient client = new HttpClient();
-            using HttpResponseMessage response = await client.GetAsync("https://localhost:7059/Rentals/");
+            using HttpResponseMessage response = await client.GetAsync("https://localhost:7260/api/Rentals/");
             response.EnsureSuccessStatusCode();
-
+            
             var jsonRespone = await response.Content.ReadAsStringAsync();
             
             var rental =
@@ -102,19 +102,17 @@ namespace SurfsUp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("ID,RentalDate,StartDate,EndDate,Email,SurfboardID")] Rental rental)
         {
-            HttpClient client = new HttpClient();
-            var jsonString = JsonConvert.SerializeObject(rental);
-            HttpContent content = new StringContent(jsonString);
-            content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-            using HttpResponseMessage response = await client.PostAsync("https://localhost:7059/Rentals", content);
-
-            if (!response.IsSuccessStatusCode)
-            {
-                return NotFound();
-            }
+            
 
             if (ModelState.IsValid)
             {
+                HttpClient client = new HttpClient();
+                using HttpResponseMessage response = await client.PostAsJsonAsync("https://localhost:7260/Rentals", rental);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    return NotFound();
+                }
                 var rented = _context.Surfboard.Where(s => s.ID == rental.SurfboardID).ToList();
                 // from Surfboard in _context.Surfboard
                 // where Surfboard.ID == globalId

@@ -5,7 +5,7 @@ VisualStudioVersion = 17.2.32630.192
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SurfsUp", "SurfsUp\SurfsUp.csproj", "{CB640AC0-29BA-488B-AB60-EB74A5F95BBC}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SurfsupApi", "..\..\SurfsupApi\SurfsupApi\SurfsupApi.csproj", "{B03EE644-A8C6-4CEA-B6B0-B08C63A0E7B8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SurfUpApi", "SurfUpApi\SurfUpApi.csproj", "{0974A2C3-FD51-44A3-83CA-41401057F142}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,10 +17,10 @@ Global
 		{CB640AC0-29BA-488B-AB60-EB74A5F95BBC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CB640AC0-29BA-488B-AB60-EB74A5F95BBC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CB640AC0-29BA-488B-AB60-EB74A5F95BBC}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B03EE644-A8C6-4CEA-B6B0-B08C63A0E7B8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B03EE644-A8C6-4CEA-B6B0-B08C63A0E7B8}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B03EE644-A8C6-4CEA-B6B0-B08C63A0E7B8}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B03EE644-A8C6-4CEA-B6B0-B08C63A0E7B8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0974A2C3-FD51-44A3-83CA-41401057F142}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0974A2C3-FD51-44A3-83CA-41401057F142}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0974A2C3-FD51-44A3-83CA-41401057F142}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0974A2C3-FD51-44A3-83CA-41401057F142}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

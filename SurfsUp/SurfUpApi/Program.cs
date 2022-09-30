@@ -1,4 +1,9 @@
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using SurfUpApi.Data;
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddDbContext<SurfUpApiContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("SurfUpApiContext") ?? throw new InvalidOperationException("Connection string 'SurfUpApiContext' not found.")));
 
 // Add services to the container.
 
