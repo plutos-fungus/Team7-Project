@@ -107,7 +107,7 @@ namespace SurfsUp.Controllers
             if (ModelState.IsValid)
             {
                 HttpClient client = new HttpClient();
-                using HttpResponseMessage response = await client.PostAsJsonAsync("https://localhost:7260/Rentals", rental);
+                using HttpResponseMessage response = await client.PostAsJsonAsync("https://localhost:7260/api/Rentals/", rental);
 
                 if (!response.IsSuccessStatusCode)
                 {
@@ -153,10 +153,7 @@ namespace SurfsUp.Controllers
         public async Task<IActionResult> Edit(int id, [Bind("ID,RentalDate,StartDate,EndDate,Email,SurfboardID")] Rental rental)
         {
             HttpClient client = new HttpClient();
-            var jsonString = JsonConvert.SerializeObject(rental);
-            HttpContent content = new StringContent(jsonString);
-            content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-            using HttpResponseMessage response = await client.PutAsync("https://localhost:7059/Rental/", content);
+            using HttpResponseMessage response = await client.PutAsJsonAsync("https://localhost:7260/api/Rentals/"+id, rental);
 
             if (!response.IsSuccessStatusCode)
             {
@@ -192,16 +189,17 @@ namespace SurfsUp.Controllers
         }
 
         // GET: Rentals/Delete/5
+        [HttpDelete]
         public async Task<IActionResult> Delete(int? id)
         {
-            HttpClient client = new HttpClient();
-            using HttpResponseMessage response = await client.DeleteAsync("https://localhost:7059/Rental/"+id);
-            if (!response.IsSuccessStatusCode)
+            if (id == null || _context.Rental == null)
             {
                 return NotFound();
             }
 
-            if (id == null || _context.Rental == null)
+            HttpClient client = new HttpClient();
+            using HttpResponseMessage response = await client.DeleteAsync("https://localhost:7260/api/Rentals/" + id);
+            if (!response.IsSuccessStatusCode)
             {
                 return NotFound();
             }
