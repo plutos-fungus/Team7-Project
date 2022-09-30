@@ -30,11 +30,4 @@ namespace SurfsUp.Models
         public byte[] RowVersion { get; set; }
         public IdentityUser? IdentityUser { get; set; }
     }
-
-    //public class SurfDBContext : DbContext
-    //{
-    //    public SurfDBContext()
-    //    {}
-    //    public DbSet<Surfboard> surfboards { get; set; }
-    //}
 }

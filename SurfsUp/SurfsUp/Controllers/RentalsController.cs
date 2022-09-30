@@ -31,6 +31,8 @@ namespace SurfsUp.Controllers
         
         public async Task<IActionResult> Index()
         {
+            // Checks if the email is an admin or not
+            // The admin page can only be accessed by the admin email.
             if (!this.User.IsInRole("Admin"))
             {
                 var usr = await _userManager.GetUserAsync(HttpContext.User);
@@ -64,7 +66,7 @@ namespace SurfsUp.Controllers
         }
 
         // GET: Rentals/Create
-        public IActionResult Create(int id)
+        public IActionResult Create(int id, byte[] rowVersion)
         {
             Rental r = new();
             r.SurfboardID = id;
@@ -77,14 +79,12 @@ namespace SurfsUp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ID,RentalDate,StartDate,EndDate,Email,SurfboardID")] Rental rental)
+        public async Task<IActionResult> Create(int id, [Bind("ID,RentalDate,StartDate,EndDate,Email,SurfboardID")] Rental rental)
         {
-            if (ModelState.IsValid)
+            bool TempBool = true;
+            try
             {
                 var rented = _context.Surfboard.Where(s => s.ID == rental.SurfboardID).ToList();
-                // from Surfboard in _context.Surfboard
-                // where Surfboard.ID == globalId
-                // select Surfboard;
                 foreach (Surfboard surfboard in rented)
                 {
                     surfboard.IsRented = true;
@@ -94,7 +94,11 @@ namespace SurfsUp.Controllers
                 await _context.SaveChangesAsync();
                 return Redirect("/Home/Index");
             }
-            return Redirect("/Home/Index");
+            catch (Exception ex)
+            {
+                TempBool = false;
+                return Redirect($"/Home/CanNotRent/{id}");
+            }
         }
 
         // GET: Rentals/Edit/5

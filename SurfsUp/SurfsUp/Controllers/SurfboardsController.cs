@@ -21,6 +21,7 @@ namespace SurfsUp.Controllers
         }
 
         // GET: Surfboards
+        // Returns the admin page if your email has the admin role.
         [Authorize(Policy = "RequiredAdminRole")]
         public async Task<IActionResult> Index()
         {
@@ -47,9 +48,9 @@ namespace SurfsUp.Controllers
             return View(surfboard);
         }
 
-        [Authorize(Policy = "RequiredAdminRole")]
-
+        // Returns the create surboard site if your email has admin role.
         // GET: Surfboards/Create
+        [Authorize(Policy = "RequiredAdminRole")]
         public IActionResult Create()
         {
             return View();
@@ -58,6 +59,7 @@ namespace SurfsUp.Controllers
         // POST: Surfboards/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        // Returns the actual create surboard site if your email has admin role.
         [Authorize(Policy = "RequiredAdminRole")]
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -75,6 +77,7 @@ namespace SurfsUp.Controllers
         }
 
         // GET: Surfboards/Edit/5
+        // Returns the edit surboard site if your email has admin role.
         [Authorize(Policy = "RequiredAdminRole")]
         public async Task<IActionResult> Edit(int? id)
         {
@@ -94,6 +97,7 @@ namespace SurfsUp.Controllers
         // POST: Surfboards/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        // Returns the actual edit surboard site if your email has admin role.
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Policy = "RequiredAdminRole")]
@@ -104,6 +108,55 @@ namespace SurfsUp.Controllers
                 return NotFound();
             }
 
+            return await CheckIfInUse(id, surfboard);
+        }
+
+        // GET: Surfboards/Delete/5
+        [Authorize(Policy = "RequiredAdminRole")]
+        public async Task<IActionResult> Delete(int? id)
+        {
+            if (id == null || _context.Surfboard == null)
+            {
+                return NotFound();
+            }
+
+            var surfboard = await _context.Surfboard
+                .FirstOrDefaultAsync(m => m.ID == id);
+            if (surfboard == null)
+            {
+                return NotFound();
+            }
+
+            return View(surfboard);
+        }
+
+        // POST: Surfboards/Delete/5
+        [HttpPost, ActionName("Delete")]
+        [Authorize(Policy = "RequiredAdminRole")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            if (_context.Surfboard == null)
+            {
+                return Problem("Entity set 'SurfsUpContext.Surfboard'  is null.");
+            }
+            var surfboard = await _context.Surfboard.FindAsync(id);
+            if (surfboard != null)
+            {
+                _context.Surfboard.Remove(surfboard);
+            }
+
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
+
+        private bool SurfboardExists(int id)
+        {
+            return (_context.Surfboard?.Any(e => e.ID == id)).GetValueOrDefault();
+        }
+
+        public async Task<IActionResult> CheckIfInUse(int id, Surfboard surfboard)
+        {
             var SurfboardToBeUpdated = await _context.Surfboard.FirstOrDefaultAsync(x => x.ID == id);
 
             //Hvis objektet ikke kan findes, er det slettet. Den følgende 'if' kodeblok håndterer dette scenarie
@@ -114,7 +167,7 @@ namespace SurfsUp.Controllers
                 //Det vil sige, det boardpost objektet vi modtog fra viewet i denne metode.
                 await TryUpdateModelAsync(deletedSurfboard);
                 //AddModelError, tilføjer fejlbeskeden brugeren skal se.
-                ModelState.AddModelError("", "Board ændringer kan ikke gemmes. En anden bruger har slettet boarded");
+                ModelState.AddModelError("", "Board ændringer kan ikke gemmes. En anden admin har ændret surfboarded");
                 //Sender objektet tilbage til viewet
                 return View(deletedSurfboard);
             }
@@ -156,7 +209,7 @@ namespace SurfsUp.Controllers
                     //Hvis boardet er slettet i mellemtiden:
                     if (databaseEntry == null)
                     {
-                        ModelState.AddModelError("", "Board ændringer kan ikke gemmes. En anden bruger har slettet boarded");
+                        ModelState.AddModelError("", "Board ændringer kan ikke gemmes. En anden bruger har allerede ændret dette surfboard");
                     }
                     else
                     {
@@ -211,52 +264,7 @@ namespace SurfsUp.Controllers
                     }
                 }
             }
-
             return View(SurfboardToBeUpdated);
-        }
-
-        // GET: Surfboards/Delete/5
-        [Authorize(Policy = "RequiredAdminRole")]
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null || _context.Surfboard == null)
-            {
-                return NotFound();
-            }
-
-            var surfboard = await _context.Surfboard
-                .FirstOrDefaultAsync(m => m.ID == id);
-            if (surfboard == null)
-            {
-                return NotFound();
-            }
-
-            return View(surfboard);
-        }
-
-        // POST: Surfboards/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [Authorize(Policy = "RequiredAdminRole")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            if (_context.Surfboard == null)
-            {
-                return Problem("Entity set 'SurfsUpContext.Surfboard'  is null.");
-            }
-            var surfboard = await _context.Surfboard.FindAsync(id);
-            if (surfboard != null)
-            {
-                _context.Surfboard.Remove(surfboard);
-            }
-
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
-
-        private bool SurfboardExists(int id)
-        {
-            return (_context.Surfboard?.Any(e => e.ID == id)).GetValueOrDefault();
         }
     }
 }
