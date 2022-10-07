@@ -23,7 +23,7 @@ namespace SurfsUp.Controllers
         private int globalId;
         private readonly UserManager<IdentityUser> _userManager;
         private readonly SignInManager<IdentityUser> _signInManager;
-        
+
 
         public RentalsController(ApplicationDbContext context, SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager)
         {
@@ -33,15 +33,15 @@ namespace SurfsUp.Controllers
         }
 
         // GET: Rentals
-        
+
         public async Task<IActionResult> Index()
         {
             HttpClient client = new HttpClient();
             using HttpResponseMessage response = await client.GetAsync("https://localhost:7260/api/Rentals/");
             response.EnsureSuccessStatusCode();
-            
+
             var jsonRespone = await response.Content.ReadAsStringAsync();
-            
+
             var rental =
                 System.Text.Json.JsonSerializer.Deserialize<List<Rental>>(jsonRespone);
 
@@ -189,7 +189,7 @@ namespace SurfsUp.Controllers
         }
 
         // GET: Rentals/Delete/5
-        [HttpDelete]
+        //[HttpDelete]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null || _context.Rental == null)
@@ -197,13 +197,7 @@ namespace SurfsUp.Controllers
                 return NotFound();
             }
 
-            HttpClient client = new HttpClient();
-            using HttpResponseMessage response = await client.DeleteAsync("https://localhost:7260/api/Rentals/" + id);
-            if (!response.IsSuccessStatusCode)
-            {
-                return NotFound();
-            }
-
+            
             var rental = await _context.Rental
                 .FirstOrDefaultAsync(m => m.ID == id);
             if (rental == null)
@@ -230,9 +224,17 @@ namespace SurfsUp.Controllers
 
         // POST: Rentals/Delete/5
         [HttpPost, ActionName("Delete")]
+        
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
+            HttpClient client = new HttpClient();
+            using HttpResponseMessage response = await client.DeleteAsync("https://localhost:7260/api/Rentals/"+id);
+            if (!response.IsSuccessStatusCode)
+            {
+                return NotFound();
+            }
+
             if (_context.Rental == null)
             {
                 return Problem("Entity set 'SurfsUpContext.Rental'  is null.");
