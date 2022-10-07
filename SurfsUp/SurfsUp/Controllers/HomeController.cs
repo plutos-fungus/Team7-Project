@@ -26,16 +26,12 @@ namespace SurfsUp.Controllers
 
         }
 
-        /*public async Task<IActionResult> Index()
-        {
-            CheckAndDelete();
-            return _context.Surfboard != null ?
-                        View(await _context.Surfboard.Where(s => s.IsRented == false).ToListAsync()) :
-                        Problem("Entity set 'SurfsUpContext.Surfboard'  is null.");
-        }*/
-
         public async Task<IActionResult> Index(string SortOrder, string currentFilter, string searchString, int? pageNumber)
         {
+            // Checks for if the DateTime for the rented board is done (plz don't remove)
+            CheckAndDelete();
+
+
             ViewData["CurrentFilter"] = searchString;
             ViewData["NameSortParm"] = String.IsNullOrEmpty(SortOrder) ? "name_desc" : "";
             ViewData["PriceSortParm"] = String.IsNullOrEmpty(SortOrder) ? "price_desc" : "";
@@ -50,9 +46,12 @@ namespace SurfsUp.Controllers
             {
                 searchString = currentFilter;
             }
+
+            // Finds all the surfboards that is not rented in the database
             var Surfboard = from s in _context.Surfboard
                             where s.IsRented == false
                             select s;
+
             if (!String.IsNullOrEmpty(searchString))
             {
                 Surfboard = Surfboard.Where(s => s.Name.Contains(searchString));
@@ -77,12 +76,11 @@ namespace SurfsUp.Controllers
             return View(await PaginatedList<Surfboard>.CreateAsync(Surfboard.AsNoTracking(), pageNumber ?? 1, pageSize));
         }
 
-        /*public async Task<IActionResult> Index(Surfboard.BoardTypes b)
+        public IActionResult CanNotRent()
         {
-            return _context.Surfboard != null ?
-                        View(await _context.Surfboard.Where(s => s.IsRented == false && s.BoardType == b).ToListAsync()) :
-                        Problem("Entity set 'SurfsUpContext.Surfboard'  is null.");
-        }*/
+            return View();
+        }
+
         public IActionResult Privacy()
         {
             return View();
@@ -103,11 +101,7 @@ namespace SurfsUp.Controllers
 
             return View(surfboard);
         }
-        //[ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        //public IActionResult Error()
-        //{
-        //    return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-        //}
+
         public void CheckAndDelete()
         {
             DateTime nowDate = DateTime.Now;
@@ -127,7 +121,7 @@ namespace SurfsUp.Controllers
                             _context.Rental.Remove(rental);
                         }
                     }
-                    //Update Rental.SurfboardId
+                    // Update Rental.SurfboardId
                     _context.SaveChanges();
                 }
 

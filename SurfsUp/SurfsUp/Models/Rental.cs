@@ -16,5 +16,7 @@ namespace SurfsUp.Models
 
         [ForeignKey("Surfboard")]
         public int SurfboardID { get; set; }
+        [Timestamp]
+        public byte[] RowVersion { get; set; }
     }
 }
