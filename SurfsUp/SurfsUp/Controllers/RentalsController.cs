@@ -146,12 +146,22 @@ namespace SurfsUp.Controllers
         // GET: Rentals/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null || _context.Rental == null)
+            if (id == null)
             {
                 return NotFound();
             }
+            HttpClient client = new HttpClient();
+            using HttpResponseMessage response = await client.GetAsync("https://localhost:7260/api/Rentals/" + id);
+            response.EnsureSuccessStatusCode();
 
-            var rental = await _context.Rental.FindAsync(id);
+            var jsonRespone = await response.Content.ReadAsStringAsync();
+
+            var options = new JsonSerializerOptions()
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            };
+
+            var rental = JsonSerializer.Deserialize<Rental>(jsonRespone, options);
             if (rental == null)
             {
                 return NotFound();
