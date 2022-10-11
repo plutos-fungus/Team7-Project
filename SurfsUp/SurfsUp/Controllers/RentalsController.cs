@@ -166,13 +166,6 @@ namespace SurfsUp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("ID,RentalDate,StartDate,EndDate,Email,SurfboardID")] Rental rental)
         {
-            HttpClient client = new HttpClient();
-            using HttpResponseMessage response = await client.PutAsJsonAsync("https://localhost:7260/api/Rentals/"+id, rental);
-
-            if (!response.IsSuccessStatusCode)
-            {
-                return NotFound();
-            }
 
             if (id != rental.ID)
             {
@@ -181,22 +174,29 @@ namespace SurfsUp.Controllers
 
             if (ModelState.IsValid)
             {
-                try
+                HttpClient client = new HttpClient();
+                using HttpResponseMessage response = await client.PutAsJsonAsync("https://localhost:7260/api/Rentals/" + id, rental);
+
+                if (!response.IsSuccessStatusCode)
                 {
-                    _context.Update(rental);
-                    await _context.SaveChangesAsync();
+                    return NotFound();
                 }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!RentalExists(rental.ID))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
+                //try
+                //{
+                //    _context.Update(rental);
+                //    await _context.SaveChangesAsync();
+                //}
+                //catch (DbUpdateConcurrencyException)
+                //{
+                //    if (!RentalExists(rental.ID))
+                //    {
+                //        return NotFound();
+                //    }
+                //    else
+                //    {
+                //        throw;
+                //    }
+                //}
                 return RedirectToAction(nameof(Index));
             }
             return View(rental);
@@ -223,6 +223,27 @@ namespace SurfsUp.Controllers
 
             var rental = JsonSerializer.Deserialize<Rental>(jsonRespone, options);
 
+            using HttpResponseMessage SurfboardResponse = await client.GetAsync("https://localhost:7260/api/Surfboards/" + rental.SurfboardID);
+
+            SurfboardResponse.EnsureSuccessStatusCode();
+
+            jsonRespone = await SurfboardResponse.Content.ReadAsStringAsync();
+
+            options = new JsonSerializerOptions()
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            };
+
+            var Surfboard = JsonSerializer.Deserialize<Surfboard>(jsonRespone, options);
+
+            Surfboard.IsRented = false;
+
+            using HttpResponseMessage SurfboardPutResponse = await client.PutAsJsonAsync("https://localhost:7260/api/Surfboards/" + Surfboard.ID, Surfboard);
+
+            if (!SurfboardPutResponse.IsSuccessStatusCode)
+            {
+                return NotFound();
+            }
 
             //var rental = await _context.Rental
             //    .FirstOrDefaultAsync(m => m.ID == id);
@@ -239,12 +260,12 @@ namespace SurfsUp.Controllers
             //    surfboard.IsRented = false;
             //    _context.Update(surfboard);
             //}
-            await _context.SaveChangesAsync();
-            _context.Add(rental);
-            if (id == null || _context.Rental == null)
-            {
-                return NotFound();
-            }
+            //await _context.SaveChangesAsync();
+            //_context.Add(rental);
+            //if (id == null || _context.Rental == null)
+            //{
+            //    return NotFound();
+            //}
             return View(rental);
         }
 
@@ -261,17 +282,17 @@ namespace SurfsUp.Controllers
                 return NotFound();
             }
 
-            if (_context.Rental == null)
-            {
-                return Problem("Entity set 'SurfsUpContext.Rental'  is null.");
-            }
-            var rental = await _context.Rental.FindAsync(id);
-            if (rental != null)
-            {
-                _context.Rental.Remove(rental);
-            }
+            //if (_context.Rental == null)
+            //{
+            //    return Problem("Entity set 'SurfsUpContext.Rental'  is null.");
+            //}
+            //var rental = await _context.Rental.FindAsync(id);
+            //if (rental != null)
+            //{
+            //    _context.Rental.Remove(rental);
+            //}
 
-            await _context.SaveChangesAsync();
+            //await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
