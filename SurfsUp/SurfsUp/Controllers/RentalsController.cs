@@ -14,6 +14,8 @@ using SurfsUp.Models;
 using System.Text.Json;
 using System.Net.Http.Headers;
 using System.Net.Http;
+using JsonSerializer = System.Text.Json.JsonSerializer;
+using Microsoft.DotNet.MSIdentity.Shared;
 
 namespace SurfsUp.Controllers
 {
@@ -23,7 +25,6 @@ namespace SurfsUp.Controllers
         private int globalId;
         private readonly UserManager<IdentityUser> _userManager;
         private readonly SignInManager<IdentityUser> _signInManager;
-
 
         public RentalsController(ApplicationDbContext context, SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager)
         {
@@ -42,8 +43,12 @@ namespace SurfsUp.Controllers
 
             var jsonRespone = await response.Content.ReadAsStringAsync();
 
-            var rental =
-                System.Text.Json.JsonSerializer.Deserialize<List<Rental>>(jsonRespone);
+            var options = new JsonSerializerOptions()
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            };
+
+            var rental = JsonSerializer.Deserialize<List<Rental>>(jsonRespone, options);
 
             if (!this.User.IsInRole("Admin") && rental != null)
             {
@@ -57,31 +62,29 @@ namespace SurfsUp.Controllers
                         Rentals.Add(valueA);
                     }
                 }
-                //var Rentals = from r in _context.Rental
-                //              where r.Email == usr.Email
-                //              select r;
                 return View(Rentals);
             }
 
-            return _context.Rental != null ?
-                        View(await _context.Rental.ToListAsync()) :
+            return rental != null ?
+                        View(rental.ToList()) :
                         Problem("Entity set 'SurfsUpContext.Rental'  is null.");
         }
 
         // GET: Rentals/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null || _context.Rental == null)
-            {
-                return NotFound();
-            }
+            HttpClient client = new HttpClient();
+            using HttpResponseMessage response = await client.GetAsync("https://localhost:7260/api/Rentals/"+id);
+            response.EnsureSuccessStatusCode();
 
-            var rental = await _context.Rental
-                .FirstOrDefaultAsync(m => m.ID == id);
-            if (rental == null)
+            var jsonRespone = await response.Content.ReadAsStringAsync();
+
+            var options = new JsonSerializerOptions()
             {
-                return NotFound();
-            }
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            };
+
+            var rental = JsonSerializer.Deserialize<Rental>(jsonRespone, options);
 
             return View(rental);
         }
@@ -102,8 +105,6 @@ namespace SurfsUp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("ID,RentalDate,StartDate,EndDate,Email,SurfboardID")] Rental rental)
         {
-            
-
             if (ModelState.IsValid)
             {
                 HttpClient client = new HttpClient();
@@ -113,17 +114,30 @@ namespace SurfsUp.Controllers
                 {
                     return NotFound();
                 }
-                var rented = _context.Surfboard.Where(s => s.ID == rental.SurfboardID).ToList();
-                // from Surfboard in _context.Surfboard
-                // where Surfboard.ID == globalId
-                // select Surfboard;
-                foreach (Surfboard surfboard in rented)
+
+                using HttpResponseMessage SurfboardResponse = await client.GetAsync("https://localhost:7260/api/Surfboards/" + rental.SurfboardID);
+
+                SurfboardResponse.EnsureSuccessStatusCode();
+                
+                var jsonRespone = await SurfboardResponse.Content.ReadAsStringAsync();
+
+                var options = new JsonSerializerOptions()
                 {
-                    surfboard.IsRented = true;
-                    _context.Update(surfboard);
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+                };
+
+                var Surfboard = JsonSerializer.Deserialize<Surfboard>(jsonRespone, options);
+
+                Surfboard.IsRented = true;
+
+                using HttpResponseMessage SurfboardPutResponse = await client.PutAsJsonAsync("https://localhost:7260/api/Surfboards/" + Surfboard.ID, Surfboard);
+
+                if (!SurfboardPutResponse.IsSuccessStatusCode)
+                {
+                    return NotFound();
                 }
-                _context.Add(rental);
-                await _context.SaveChangesAsync();
+
+
                 return Redirect("/Home/Index");
             }
             return Redirect("/Home/Index");
@@ -192,27 +206,39 @@ namespace SurfsUp.Controllers
         //[HttpDelete]
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null || _context.Rental == null)
+            if (id == null)
             {
                 return NotFound();
             }
 
-            
-            var rental = await _context.Rental
-                .FirstOrDefaultAsync(m => m.ID == id);
-            if (rental == null)
+            HttpClient client = new HttpClient();
+            using HttpResponseMessage response = await client.GetAsync("https://localhost:7260/api/Rentals/" + id);
+            response.EnsureSuccessStatusCode();
+
+            var jsonRespone = await response.Content.ReadAsStringAsync();
+            var options = new JsonSerializerOptions()
             {
-                return NotFound();
-            }
-            var rented = _context.Surfboard.Where(s => s.ID == rental.SurfboardID).ToList();
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            };
+
+            var rental = JsonSerializer.Deserialize<Rental>(jsonRespone, options);
+
+
+            //var rental = await _context.Rental
+            //    .FirstOrDefaultAsync(m => m.ID == id);
+            //if (rental == null)
+            //{
+            //    return NotFound();
+            //}
+            //var rented = _context.Surfboard.Where(s => s.ID == rental.SurfboardID).ToList();
             // from Surfboard in _context.Surfboard
             // where Surfboard.ID == globalId
             // select Surfboard;
-            foreach (Surfboard surfboard in rented)
-            {
-                surfboard.IsRented = false;
-                _context.Update(surfboard);
-            }
+            //foreach (Surfboard surfboard in rented)
+            //{
+            //    surfboard.IsRented = false;
+            //    _context.Update(surfboard);
+            //}
             await _context.SaveChangesAsync();
             _context.Add(rental);
             if (id == null || _context.Rental == null)

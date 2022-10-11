@@ -7,6 +7,7 @@ using SurfsUp;
 using System.Runtime.Loader;
 using SurfsUp.Areas.Identity.Data;
 using Microsoft.AspNetCore.Identity;
+using System.Text.Json;
 
 namespace SurfsUp.Controllers
 {
@@ -50,31 +51,42 @@ namespace SurfsUp.Controllers
             {
                 searchString = currentFilter;
             }
-            var Surfboard = from s in _context.Surfboard
+
+            HttpClient client = new HttpClient();
+            using HttpResponseMessage response = await client.GetAsync("https://localhost:7260/api/Surfboards/");
+            response.EnsureSuccessStatusCode();
+            var jsonRespone = await response.Content.ReadAsStringAsync();
+            var options = new JsonSerializerOptions()
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            };
+            var Surfboard = JsonSerializer.Deserialize<List<Surfboard>>(jsonRespone, options);
+
+            var Hej = from s in Surfboard
                             where s.IsRented == false
                             select s;
             if (!String.IsNullOrEmpty(searchString))
             {
-                Surfboard = Surfboard.Where(s => s.Name.Contains(searchString));
+                Hej = Hej.Where(s => s.Name.Contains(searchString));
             }
 
             switch (SortOrder)
             {
                 case "name_desc":
-                    Surfboard = Surfboard.OrderBy(s => s.Name);
+                    Hej = Hej.OrderBy(s => s.Name);
                     break;
                 case "price_desc":
-                    Surfboard = Surfboard.OrderByDescending(s => s.Price);
+                    Hej = Hej.OrderByDescending(s => s.Price);
                     break;
                 case "BoardType_desc":
-                    Surfboard = Surfboard.OrderBy(s => s.BoardType);
+                    Hej = Hej.OrderBy(s => s.BoardType);
                     break;
                 default:
-                    Surfboard = Surfboard.OrderBy(s => s.Price);
+                    Hej = Hej.OrderBy(s => s.Price);
                     break;
             }
             int pageSize = 3;
-            return View(await PaginatedList<Surfboard>.CreateAsync(Surfboard.AsNoTracking(), pageNumber ?? 1, pageSize));
+            return View(await PaginatedList<Surfboard>.CreateAsync(Hej, pageNumber ?? 1, pageSize));
         }
 
         /*public async Task<IActionResult> Index(Surfboard.BoardTypes b)

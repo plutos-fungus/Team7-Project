@@ -13,6 +13,8 @@ namespace SurfUpApi.Models
         public DateTime EndDate { get; set; }
         [StringLength(255)]
         public string Email { get; set; }
+
+        [ForeignKey("Surfboard")]
         public int SurfboardID { get; set; }
     }
 }

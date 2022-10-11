@@ -1,21 +1,19 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using SurfsUp.Areas.Identity.Data;
+using SurfUpApi.Data;
 using System;
 using System.Security.Cryptography.X509Certificates;
 
-namespace SurfsUp.Models
+namespace SurfUpApi.Models
 {
-
-    public static class SeedData
+    public class SeedData
     {
-       
         public async static Task Initialize(IServiceProvider serviceProvider)
         {
-            using (var context = new ApplicationDbContext(
+            using (var context = new SurfUpApiContext(
                 serviceProvider.GetRequiredService<
-                    DbContextOptions<ApplicationDbContext>>()))
+                    DbContextOptions<SurfUpApiContext>>()))
             {
 
                 //Sætter "roleManager" variable til typen "RoleManager" med type parameter af "IdentityRole"
@@ -77,7 +75,7 @@ namespace SurfsUp.Models
                     }
                 }
 
-                
+
 
                 // Look for any movies.
                 else if (context.Surfboard.Any())
@@ -213,8 +211,6 @@ namespace SurfsUp.Models
                 );
                 context.SaveChanges();
             }
-
-
         }
     }
 }

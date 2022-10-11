@@ -25,8 +25,8 @@ namespace SurfsUp.Controllers
         public async Task<IActionResult> Index()
         {
             return _context.Surfboard != null ?
-                        View(await _context.Surfboard.ToListAsync()) :
-                        Problem("Entity set 'SurfsUpContext.Surfboard'  is null.");
+                View(await _context.Surfboard.ToListAsync()) :
+                Problem("Entity set 'SurfsUpContext.Surfboard'  is null.");
         }
 
         // GET: Surfboards/Details/5
