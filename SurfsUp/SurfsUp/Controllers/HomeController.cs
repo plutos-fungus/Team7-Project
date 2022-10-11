@@ -99,48 +99,105 @@ namespace SurfsUp.Controllers
         {
             return View();
         }
+
+
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null || _context.Surfboard == null)
-            {
-                return NotFound();
-            }
+            HttpClient client = new HttpClient();
+            using HttpResponseMessage response = await client.GetAsync("https://localhost:7260/api/Surfboards/" + id);
+            response.EnsureSuccessStatusCode();
 
-            var surfboard = await _context.Surfboard
-                .FirstOrDefaultAsync(m => m.ID == id);
-            if (surfboard == null)
+            var jsonRespone = await response.Content.ReadAsStringAsync();
+
+            var options = new JsonSerializerOptions()
             {
-                return NotFound();
-            }
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            };
+
+            var surfboard = JsonSerializer.Deserialize<Surfboard>(jsonRespone, options);
 
             return View(surfboard);
+            //if (id == null || _context.Surfboard == null)
+            //{
+            //    return NotFound();
+            //}
+
+            //var surfboard = await _context.Surfboard
+            //    .FirstOrDefaultAsync(m => m.ID == id);
+            //if (surfboard == null)
+            //{
+            //    return NotFound();
+            //}
+
+            //return View(surfboard);
         }
+
+        /*
+         * Works????
+         */
         //[ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         //public IActionResult Error()
         //{
         //    return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         //}
-        public void CheckAndDelete()
+        public async void CheckAndDelete()
         {
             DateTime nowDate = DateTime.Now;
-            var rentCheck = _context.Rental.ToList();
-            var allSurfboards = _context.Surfboard.Where(s => s.IsRented == true).ToList();
+            HttpClient client = new HttpClient();
+            using HttpResponseMessage response = await client.GetAsync("https://localhost:7260/api/Rentals/");
+            response.EnsureSuccessStatusCode();
 
-            foreach (Rental rental in rentCheck)
+            var jsonRespone = await response.Content.ReadAsStringAsync();
+
+            var options = new JsonSerializerOptions()
             {
-                if (rental.EndDate <= nowDate)
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            };
+
+            var rental = JsonSerializer.Deserialize<List<Rental>>(jsonRespone, options);
+
+            var rentCheck = rental.ToList();
+
+            client = new HttpClient();
+            using HttpResponseMessage surfResponse = await client.GetAsync("https://localhost:7260/api/Surfboards/");
+            surfResponse.EnsureSuccessStatusCode();
+            var surfJsonRespone = await response.Content.ReadAsStringAsync();
+            options = new JsonSerializerOptions()
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            };
+            var Surfboard = JsonSerializer.Deserialize<List<Surfboard>>(surfJsonRespone, options);
+
+            var allSurfboards = Surfboard.Where(s => s.IsRented == true).ToList();
+
+            //DateTime nowDate = DateTime.Now;
+            //var rentCheck = _context.Rental.ToList();
+            //var allSurfboards = _context.Surfboard.Where(s => s.IsRented == true).ToList();
+
+            foreach (Rental rent in rentCheck)
+            {
+                if (rent.EndDate <= nowDate)
                 {
                     foreach (Surfboard surfboard in allSurfboards)
                     {
-                        if (rental.SurfboardID == surfboard.ID)
+                        if (rent.SurfboardID == surfboard.ID)
                         {
                             surfboard.IsRented = false;
-                            _context.Surfboard.Update(surfboard);
-                            _context.Rental.Remove(rental);
+                            client = new HttpClient();
+                            using HttpResponseMessage tempResponse = await client.PutAsJsonAsync("https://localhost:7260/api/Rentals/" + rent.ID, rent);
+                            using HttpResponseMessage temp2Response = await client.PutAsJsonAsync("https://localhost:7260/api/Rentals/" + surfboard.ID, surfboard);
+
+                            if (!tempResponse.IsSuccessStatusCode && !temp2Response.IsSuccessStatusCode)
+                            {
+                                //return NotFound();
+                            }
+                            //surfboard.IsRented = false;
+                            //_context.Surfboard.Update(surfboard);
+                            //_context.Rental.Remove(rent);
                         }
                     }
                     //Update Rental.SurfboardId
-                    _context.SaveChanges();
+                    //_context.SaveChanges();
                 }
 
             }

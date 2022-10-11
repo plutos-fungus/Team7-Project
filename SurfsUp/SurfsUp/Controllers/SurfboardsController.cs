@@ -270,6 +270,9 @@ namespace SurfsUp.Controllers
             return View(SurfboardToBeUpdated);
         }
 
+        /*
+         * Not updated to API
+         */
         // GET: Surfboards/Delete/5
         [Authorize(Policy = "RequiredAdminRole")]
         public async Task<IActionResult> Delete(int? id)
@@ -289,6 +292,9 @@ namespace SurfsUp.Controllers
             return View(surfboard);
         }
 
+        /*
+         * Not updated to API
+         */
         // POST: Surfboards/Delete/5
         [HttpPost, ActionName("Delete")]
         [Authorize(Policy = "RequiredAdminRole")]
