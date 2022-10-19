@@ -142,8 +142,6 @@ namespace SurfsUp.Controllers
                 {
                     return NotFound();
                 }
-
-
                 return Redirect("/Home/Index");
             }
             return Redirect("/Home/Index");

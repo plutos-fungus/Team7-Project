@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
-using AspNetCore;
+//using AspNetCore;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -168,17 +168,6 @@ namespace SurfsUp.Controllers
                 return NotFound();
             }
 
-            return await OptimisticLock(id, surfboard);
-        }
-        #endregion
-
-        public async Task<IActionResult> OptimisticLock(int id, Surfboard surfboard)
-        {
-            if (id != surfboard.ID)
-            {
-                return NotFound();
-            }
-
             if (ModelState.IsValid)
             {
                 HttpClient client = new HttpClient();
@@ -186,12 +175,34 @@ namespace SurfsUp.Controllers
 
                 if (!response.IsSuccessStatusCode)
                 {
-                    return Redirect("/Home/NotWorking");
+                    return Redirect("/Home/NotWorking/");
                 }
-                return View(surfboard);
+                return Redirect("/Home/NotWorking/");
+                //return View(surfboard);
                 //return RedirectToAction(nameof(Index));
             }
-            return Redirect("/Home/NotWorking");
+            return Redirect("/Home/NotWorking/");
+
+            //return await OptimisticLock(id, surfboard);
+        }
+        #endregion
+
+        public async Task<IActionResult> OptimisticLock(int id, Surfboard surfboard)
+        {
+            if (ModelState.IsValid)
+            {
+                HttpClient client = new HttpClient();
+                using HttpResponseMessage response = await client.PutAsJsonAsync("https://localhost:7260/api/Surfboards/" + id, surfboard);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    return Redirect("/Home/NotWorking/");
+                }
+                return Redirect("/Home/NotWorking/");
+                //return View(surfboard);
+                //return RedirectToAction(nameof(Index));
+            }
+            return Redirect("/Home/NotWorking/");
         }
 
 
