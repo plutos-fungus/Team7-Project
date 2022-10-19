@@ -27,6 +27,7 @@ namespace SurfsUp.Controllers
 
         }
 
+        #region Some Commend
         /*public async Task<IActionResult> Index()
         {
             CheckAndDelete();
@@ -34,7 +35,9 @@ namespace SurfsUp.Controllers
                         View(await _context.Surfboard.Where(s => s.IsRented == false).ToListAsync()) :
                         Problem("Entity set 'SurfsUpContext.Surfboard'  is null.");
         }*/
+        #endregion
 
+        #region Works With API
         public async Task<IActionResult> Index(string SortOrder, string currentFilter, string searchString, int? pageNumber)
         {
             ViewData["CurrentFilter"] = searchString;
@@ -88,19 +91,28 @@ namespace SurfsUp.Controllers
             int pageSize = 3;
             return View(await PaginatedList<Surfboard>.CreateAsync(Hej, pageNumber ?? 1, pageSize));
         }
+        #endregion
 
+        #region Some Comment
         /*public async Task<IActionResult> Index(Surfboard.BoardTypes b)
         {
             return _context.Surfboard != null ?
                         View(await _context.Surfboard.Where(s => s.IsRented == false && s.BoardType == b).ToListAsync()) :
                         Problem("Entity set 'SurfsUpContext.Surfboard'  is null.");
         }*/
+        #endregion
+
         public IActionResult Privacy()
         {
             return View();
         }
 
+        //public IActionResult NotWorking()
+        //{
+        //    return View();
+        //}
 
+        #region Works With API
         public async Task<IActionResult> Details(int? id)
         {
             HttpClient client = new HttpClient();
@@ -131,7 +143,9 @@ namespace SurfsUp.Controllers
 
             //return View(surfboard);
         }
+        #endregion
 
+        #region Some Comment
         /*
          * Works????
          */
@@ -140,6 +154,9 @@ namespace SurfsUp.Controllers
         //{
         //    return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         //}
+        #endregion
+
+        #region Works With API
         public async void CheckAndDelete()
         {
             DateTime nowDate = DateTime.Now;
@@ -202,6 +219,6 @@ namespace SurfsUp.Controllers
 
             }
         }
-
+        #endregion
     }
 }

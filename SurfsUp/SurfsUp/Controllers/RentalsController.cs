@@ -33,8 +33,8 @@ namespace SurfsUp.Controllers
             _userManager = userManager;
         }
 
+        #region Works With API
         // GET: Rentals
-
         public async Task<IActionResult> Index()
         {
             HttpClient client = new HttpClient();
@@ -69,7 +69,9 @@ namespace SurfsUp.Controllers
                         View(rental.ToList()) :
                         Problem("Entity set 'SurfsUpContext.Rental'  is null.");
         }
+        #endregion
 
+        #region Works With API
         // GET: Rentals/Details/5
         public async Task<IActionResult> Details(int? id)
         {
@@ -88,7 +90,9 @@ namespace SurfsUp.Controllers
 
             return View(rental);
         }
+        #endregion
 
+        #region Works With API
         // GET: Rentals/Create
         public IActionResult Create(int id)
         {
@@ -97,7 +101,9 @@ namespace SurfsUp.Controllers
             globalId = id;
             return View(r);
         }
+        #endregion
 
+        #region Works With API
         // POST: Rentals/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
@@ -142,7 +148,9 @@ namespace SurfsUp.Controllers
             }
             return Redirect("/Home/Index");
         }
+        #endregion
 
+        #region Works With API
         // GET: Rentals/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
@@ -168,7 +176,9 @@ namespace SurfsUp.Controllers
             }
             return View(rental);
         }
+        #endregion
 
+        #region Works With API
         // POST: Rentals/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
@@ -211,11 +221,13 @@ namespace SurfsUp.Controllers
             }
             return View(rental);
         }
+        #endregion
 
-        // GET: Rentals/Delete/5
-        //[HttpDelete]
+        #region Works With API
         public async Task<IActionResult> Delete(int? id)
         {
+            // GET: Rentals/Delete/5
+            //[HttpDelete]
             if (id == null)
             {
                 return NotFound();
@@ -278,10 +290,11 @@ namespace SurfsUp.Controllers
             //}
             return View(rental);
         }
+        #endregion Works With API
 
+        #region Works With API
         // POST: Rentals/Delete/5
         [HttpPost, ActionName("Delete")]
-        
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
@@ -305,10 +318,13 @@ namespace SurfsUp.Controllers
             //await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
+        #endregion
 
+        #region Works With API
         private bool RentalExists(int id)
         {
             return (_context.Rental?.Any(e => e.ID == id)).GetValueOrDefault();
         }
+        #endregion
     }
 }
