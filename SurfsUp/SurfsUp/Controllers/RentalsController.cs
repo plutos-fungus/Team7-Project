@@ -103,7 +103,7 @@ namespace SurfsUp.Controllers
         }
         #endregion
 
-        #region Works With API
+        #region Works with API
         // POST: Rentals/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
@@ -118,13 +118,13 @@ namespace SurfsUp.Controllers
 
                 if (!response.IsSuccessStatusCode)
                 {
-                    return NotFound();
+                    return RedirectToAction("CanNotRent");
                 }
 
                 using HttpResponseMessage SurfboardResponse = await client.GetAsync("https://localhost:7260/api/Surfboards/" + rental.SurfboardID);
 
                 SurfboardResponse.EnsureSuccessStatusCode();
-                
+
                 var jsonRespone = await SurfboardResponse.Content.ReadAsStringAsync();
 
                 var options = new JsonSerializerOptions()
@@ -140,13 +140,18 @@ namespace SurfsUp.Controllers
 
                 if (!SurfboardPutResponse.IsSuccessStatusCode)
                 {
-                    return NotFound();
+                    return RedirectToAction("CanNotRent");
                 }
                 return Redirect("/Home/Index");
             }
             return Redirect("/Home/Index");
         }
         #endregion
+
+        public IActionResult CanNotRent()
+        {
+            return View();
+        }
 
         #region Works With API
         // GET: Rentals/Edit/5
@@ -318,11 +323,11 @@ namespace SurfsUp.Controllers
         }
         #endregion
 
-        #region Works With API
-        private bool RentalExists(int id)
-        {
-            return (_context.Rental?.Any(e => e.ID == id)).GetValueOrDefault();
-        }
+        #region I have no idea what this is
+        //private bool RentalExists(int id)
+        //{
+        //    return (_context.Rental?.Any(e => e.ID == id)).GetValueOrDefault();
+        //}
         #endregion
     }
 }

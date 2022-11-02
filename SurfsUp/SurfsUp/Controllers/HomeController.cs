@@ -107,11 +107,6 @@ namespace SurfsUp.Controllers
             return View();
         }
 
-        //public IActionResult NotWorking()
-        //{
-        //    return View();
-        //}
-
         #region Works With API
         public async Task<IActionResult> Details(int? id)
         {
