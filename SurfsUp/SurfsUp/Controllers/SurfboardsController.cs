@@ -112,7 +112,7 @@ namespace SurfsUp.Controllers
         }
         #endregion
 
-        #region hej
+        #region Works with API
         // GET: Surfboards/Edit/5
         [Authorize(Policy = "RequiredAdminRole")]
         public async Task<IActionResult> Edit(int? id)
@@ -147,7 +147,7 @@ namespace SurfsUp.Controllers
         }
         #endregion
 
-        #region Doesn't work yet
+        #region Works with API
         /*
          * Not updated to API
          */
