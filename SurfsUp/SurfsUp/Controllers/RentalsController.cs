@@ -22,40 +22,51 @@ namespace SurfsUp.Controllers
 {
     public class RentalsController : Controller
     {
-        private readonly ApplicationDbContext _context;
-        private int globalId;
+        //private readonly ApplicationDbContext _context;
         private readonly UserManager<IdentityUser> _userManager;
         private readonly SignInManager<IdentityUser> _signInManager;
+        private HttpClient client;
+        private readonly string APILink = @"https://localhost:7260/api/Rentals/";
 
-        public RentalsController(ApplicationDbContext context, SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager)
+        public RentalsController(SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager)
         {
-            _context = context;
+            //_context = context;
             _signInManager = signInManager;
             _userManager = userManager;
+            client = new HttpClient();
         }
 
-        #region Works With API
-        // GET: Rentals
-        public async Task<IActionResult> Index()
+        public async Task<object> ReturnRentalOrRentalList(int? id)
         {
-            HttpClient client = new HttpClient();
-            using HttpResponseMessage response = await client.GetAsync("https://localhost:7260/api/Rentals/");
+            string link = APILink;
+
+            if (id != null)
+            {
+                link += id;
+            }
+
+            using HttpResponseMessage response = await client.GetAsync(link);
             response.EnsureSuccessStatusCode();
-
-            var jsonRespone = await response.Content.ReadAsStringAsync();
-
+            var jsonResponse = await response.Content.ReadAsStringAsync();
             var options = new JsonSerializerOptions()
             {
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase
             };
 
-            var rental = JsonSerializer.Deserialize<List<Rental>>(jsonRespone, options);
+            if (id == null)
+            {
+                return JsonSerializer.Deserialize<List<Rental>>(jsonResponse, options);
+            }
+            return JsonSerializer.Deserialize<Rental>(jsonResponse, options);
 
+        }
+
+        public async Task<List<Rental>> UserSpecificRental(List<Rental> rental)
+        {
+            List<Rental> Rentals = new List<Rental>();
             if (!this.User.IsInRole("Admin") && rental != null)
             {
                 var usr = await _userManager.GetUserAsync(HttpContext.User);
-
-                List<Rental> Rentals = new List<Rental>();
                 foreach (Rental valueA in rental)
                 {
                     if (valueA.Email == usr.Email)
@@ -63,12 +74,26 @@ namespace SurfsUp.Controllers
                         Rentals.Add(valueA);
                     }
                 }
-                return View(Rentals);
             }
+            return Rentals;
+        }
 
-            return rental != null ?
-                        View(rental.ToList()) :
-                        Problem("Entity set 'SurfsUpContext.Rental'  is null.");
+        #region Index works With API
+        // GET: Rentals
+        public async Task<IActionResult> Index()
+        {
+            var rental = await ReturnRentalOrRentalList(null) as List<Rental>;
+
+            if (this.User.IsInRole("Admin"))
+            {
+                return rental != null ?
+                    View(rental.ToList()) :
+                    Problem("Entity set 'SurfsUpContext.Rental'  is null.");
+            }
+            else
+            {
+                return View(await UserSpecificRental(rental));
+            }
         }
         #endregion
 
@@ -76,20 +101,7 @@ namespace SurfsUp.Controllers
         // GET: Rentals/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            HttpClient client = new HttpClient();
-            using HttpResponseMessage response = await client.GetAsync("https://localhost:7260/api/Rentals/"+id);
-            response.EnsureSuccessStatusCode();
-
-            var jsonRespone = await response.Content.ReadAsStringAsync();
-
-            var options = new JsonSerializerOptions()
-            {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-            };
-
-            var rental = JsonSerializer.Deserialize<Rental>(jsonRespone, options);
-
-            return View(rental);
+            return View(await ReturnRentalOrRentalList(id));
         }
         #endregion
 
@@ -101,7 +113,6 @@ namespace SurfsUp.Controllers
             // instantiate a new rental with the given SurfboardID
             Rental r = new();
             r.SurfboardID = id;
-            globalId = id;
             //returns the new rental to the view layer
             return View(r);
         }

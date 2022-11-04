@@ -25,8 +25,6 @@ namespace SurfUpApi.Models
         [StringLength(50)]
         public string? Image { get; set; }
         public bool IsRented { get; set; }
-        [Timestamp]
-        public byte[] RowVersion { get; set; }
         public IdentityUser? IdentityUser { get; set; }
     }
 }

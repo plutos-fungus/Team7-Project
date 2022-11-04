@@ -15,14 +15,12 @@ namespace SurfsUp.Controllers
 {
     public class SurfboardsController : Controller
     {
-        private readonly ApplicationDbContext _context;
 
-        public SurfboardsController(ApplicationDbContext context)
+        public SurfboardsController()
         {
-            _context = context;
         }
 
-        #region Works With API
+        #region Index works With API
         // GET: Surfboards
         [Authorize(Policy = "RequiredAdminRole")]
         public async Task<IActionResult> Index()
@@ -44,7 +42,7 @@ namespace SurfsUp.Controllers
         }
         #endregion
 
-        #region Works With API
+        #region Details works With API
         // GET: Surfboards/Details/5
         public async Task<IActionResult> Details(int? id)
         {
@@ -78,14 +76,17 @@ namespace SurfsUp.Controllers
         }
         #endregion
 
+        #region Creat works with API
         [Authorize(Policy = "RequiredAdminRole")]
         // GET: Surfboards/Create
         public IActionResult Create()
         {
+            Surfboard s = new();
             return View();
         }
+        #endregion
 
-        #region Doesn't work
+        #region Create works with API
         /*
         * Doesn't work!!
         */
@@ -97,22 +98,19 @@ namespace SurfsUp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("ID,Name,BoardType,Length,Width,Thickness,Volume,Price,EquipmentTypes,Image")] Surfboard surfboard)
         {
-            ModelState.Remove("RowVersion");
-            if (ModelState.IsValid)
+            //ModelState.Remove("");
+            
+            HttpClient client = new HttpClient();
+            using HttpResponseMessage response = await client.PostAsJsonAsync("https://localhost:7260/api/Surfboards/", surfboard);
+            if (!response.IsSuccessStatusCode)
             {
-                HttpClient client = new HttpClient();
-                using HttpResponseMessage response = await client.PostAsJsonAsync("https://localhost:7260/api/Surboards/", surfboard);
-
-                if (!response.IsSuccessStatusCode)
-                {
-                    return NotFound();
-                }
+                return NotFound();
             }
-            return View(surfboard);
+            return Redirect("/Surfboards");
         }
         #endregion
 
-        #region Works with API
+        #region Edit works with API
         // GET: Surfboards/Edit/5
         [Authorize(Policy = "RequiredAdminRole")]
         public async Task<IActionResult> Edit(int? id)
@@ -147,7 +145,7 @@ namespace SurfsUp.Controllers
         }
         #endregion
 
-        #region Works with API
+        #region Edit works with API
         /*
          * Not updated to API
          */
@@ -157,7 +155,7 @@ namespace SurfsUp.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Policy = "RequiredAdminRole")]
-        public async Task<IActionResult> Edit(int id, [Bind("ID,Name,BoardType,Length,Width,Thickness,Volume,Price,EquipmentTypes,Image,RowVersion")] Surfboard surfboard)
+        public async Task<IActionResult> Edit(int id, [Bind("ID,Name,BoardType,Length,Width,Thickness,Volume,Price,EquipmentTypes,Image,")] Surfboard surfboard)
         {
             if (id != surfboard.ID)
             {
@@ -182,7 +180,7 @@ namespace SurfsUp.Controllers
             return View();
         }
 
-        #region Not Updated To API yet
+        #region Delete works with API
         /*
          * Not updated to API
          */
@@ -190,23 +188,36 @@ namespace SurfsUp.Controllers
         [Authorize(Policy = "RequiredAdminRole")]
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null || _context.Surfboard == null)
+            if (id == null)
             {
                 return NotFound();
             }
 
-            var surfboard = await _context.Surfboard
-                .FirstOrDefaultAsync(m => m.ID == id);
-            if (surfboard == null)
+            HttpClient client = new HttpClient();
+            using HttpResponseMessage response = await client.GetAsync("https://localhost:7260/api/Surfboards/" + id);
+            response.EnsureSuccessStatusCode();
+
+            var jsonResponse = await response.Content.ReadAsStringAsync();
+            var options = new JsonSerializerOptions()
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            };
+
+            var surfboard = JsonSerializer.Deserialize<Surfboard>(jsonResponse, options);
+
+            using HttpResponseMessage SurfboardPutResponse = await client.PutAsJsonAsync("https://localhost:7260/api/Surfboards/" + surfboard.ID, surfboard);
+
+            if (!SurfboardPutResponse.IsSuccessStatusCode)
             {
                 return NotFound();
             }
+
 
             return View(surfboard);
         }
         #endregion
 
-        #region Not working with API yet
+        #region Delete Confirmed works with API
         /*
          * Not updated to API
          */
@@ -217,26 +228,11 @@ namespace SurfsUp.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             HttpClient client = new HttpClient();
-            using HttpResponseMessage response = await client.GetAsync("https://localhost:7260/api/Rentals/");
-            response.EnsureSuccessStatusCode();
-            var jsonRespone = await response.Content.ReadAsStringAsync();
-            var options = new JsonSerializerOptions()
+            using HttpResponseMessage response = await client.DeleteAsync("https://localhost:7260/api/Surfboards/" + id);
+            if (!response.IsSuccessStatusCode)
             {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-            };
-            var surfboard = JsonSerializer.Deserialize<List<Rental>>(jsonRespone, options);
-
-            //if (_context.Surfboard == null)
-            //{
-            //    return Problem("Entity set 'SurfsUpContext.Surfboard'  is null.");
-            //}
-            //var surfboard = await _context.Surfboard.FindAsync(id);
-            //if (surfboard != null)
-            //{
-            //    _context.Surfboard.Remove(surfboard);
-            //}
-
-            await _context.SaveChangesAsync();
+                return NotFound();
+            }
             return RedirectToAction(nameof(Index));
         }
         #endregion
