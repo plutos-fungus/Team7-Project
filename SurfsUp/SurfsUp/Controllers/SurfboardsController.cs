@@ -98,35 +98,13 @@ namespace SurfsUp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("ID,Name,BoardType,Length,Width,Thickness,Volume,Price,EquipmentTypes,Image")] Surfboard surfboard)
         {
-            ModelState.Remove("RowVersion");
-            if (ModelState.IsValid)
+            //ModelState.Remove("RowVersion");
+            
+            HttpClient client = new HttpClient();
+            using HttpResponseMessage response = await client.PostAsJsonAsync("https://localhost:7260/api/Surfboards/", surfboard);
+            if (!response.IsSuccessStatusCode)
             {
-                HttpClient client = new HttpClient();
-                using HttpResponseMessage response = await client.PostAsJsonAsync("https://localhost:7260/api/Surboards/", surfboard);
-
-                if (!response.IsSuccessStatusCode)
-                {
-                    return NotFound();
-                }
-                using HttpResponseMessage SurfboardResponse = await client.GetAsync("https://localhost:7260/api/Surfboards/");
-
-                SurfboardResponse.EnsureSuccessStatusCode();
-
-                var jsonRespone = await SurfboardResponse.Content.ReadAsStringAsync();
-
-                var options = new JsonSerializerOptions()
-                {
-                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-                };
-
-                var Surfboard = JsonSerializer.Deserialize<Surfboard>(jsonRespone, options);
-
-                using HttpResponseMessage SurfboardPutResponse = await client.PostAsJsonAsync("https://localhost:7260/api/SurfBoards/", Surfboard);
-                if (!SurfboardPutResponse.IsSuccessStatusCode)
-                {
-                    return NotFound();
-                }
-                return Redirect("/Surfboards");
+                return NotFound();
             }
             return Redirect("/Surfboards");
         }
