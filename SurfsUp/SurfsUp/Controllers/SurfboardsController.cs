@@ -22,7 +22,7 @@ namespace SurfsUp.Controllers
             _context = context;
         }
 
-        #region Works With API
+        #region Works With API (INDEX)
         // GET: Surfboards
         [Authorize(Policy = "RequiredAdminRole")]
         public async Task<IActionResult> Index()
@@ -44,7 +44,7 @@ namespace SurfsUp.Controllers
         }
         #endregion
 
-        #region Works With API
+        #region Works With API (DETAILS)
         // GET: Surfboards/Details/5
         public async Task<IActionResult> Details(int? id)
         {
@@ -82,6 +82,7 @@ namespace SurfsUp.Controllers
         // GET: Surfboards/Create
         public IActionResult Create()
         {
+            Surfboard s = new();
             return View();
         }
 
@@ -107,12 +108,31 @@ namespace SurfsUp.Controllers
                 {
                     return NotFound();
                 }
+                using HttpResponseMessage SurfboardResponse = await client.GetAsync("https://localhost:7260/api/Surfboards/");
+
+                SurfboardResponse.EnsureSuccessStatusCode();
+
+                var jsonRespone = await SurfboardResponse.Content.ReadAsStringAsync();
+
+                var options = new JsonSerializerOptions()
+                {
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+                };
+
+                var Surfboard = JsonSerializer.Deserialize<Surfboard>(jsonRespone, options);
+
+                using HttpResponseMessage SurfboardPutResponse = await client.PostAsJsonAsync("https://localhost:7260/api/SurfBoards/", Surfboard);
+                if (!SurfboardPutResponse.IsSuccessStatusCode)
+                {
+                    return NotFound();
+                }
+                return Redirect("/Surfboards");
             }
-            return View(surfboard);
+            return Redirect("/Surfboards");
         }
         #endregion
 
-        #region Works with API
+        #region Works with API (EDIT)
         // GET: Surfboards/Edit/5
         [Authorize(Policy = "RequiredAdminRole")]
         public async Task<IActionResult> Edit(int? id)
@@ -147,7 +167,7 @@ namespace SurfsUp.Controllers
         }
         #endregion
 
-        #region Works with API
+        #region Works with API (EDIT)
         /*
          * Not updated to API
          */
@@ -182,7 +202,7 @@ namespace SurfsUp.Controllers
             return View();
         }
 
-        #region Not Updated To API yet
+        #region Works with API (DELETE)
         /*
          * Not updated to API
          */
@@ -190,23 +210,36 @@ namespace SurfsUp.Controllers
         [Authorize(Policy = "RequiredAdminRole")]
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null || _context.Surfboard == null)
+            if (id == null)
             {
                 return NotFound();
             }
 
-            var surfboard = await _context.Surfboard
-                .FirstOrDefaultAsync(m => m.ID == id);
-            if (surfboard == null)
+            HttpClient client = new HttpClient();
+            using HttpResponseMessage response = await client.GetAsync("https://localhost:7260/api/Surfboards/" + id);
+            response.EnsureSuccessStatusCode();
+
+            var jsonResponse = await response.Content.ReadAsStringAsync();
+            var options = new JsonSerializerOptions()
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            };
+
+            var surfboard = JsonSerializer.Deserialize<Surfboard>(jsonResponse, options);
+
+            using HttpResponseMessage SurfboardPutResponse = await client.PutAsJsonAsync("https://localhost:7260/api/Surfboards/" + surfboard.ID, surfboard);
+
+            if (!SurfboardPutResponse.IsSuccessStatusCode)
             {
                 return NotFound();
             }
+
 
             return View(surfboard);
         }
         #endregion
 
-        #region Not working with API yet
+        #region Works with API (DELETE CONFIRMED)
         /*
          * Not updated to API
          */
@@ -217,14 +250,21 @@ namespace SurfsUp.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             HttpClient client = new HttpClient();
-            using HttpResponseMessage response = await client.GetAsync("https://localhost:7260/api/Rentals/");
-            response.EnsureSuccessStatusCode();
-            var jsonRespone = await response.Content.ReadAsStringAsync();
-            var options = new JsonSerializerOptions()
+            using HttpResponseMessage response = await client.DeleteAsync("https://localhost:7260/api/Surfboards/" + id);
+            if (!response.IsSuccessStatusCode)
             {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-            };
-            var surfboard = JsonSerializer.Deserialize<List<Rental>>(jsonRespone, options);
+                return NotFound();
+            }
+            
+            
+            
+            //response.EnsureSuccessStatusCode();
+            //var jsonRespone = await response.Content.ReadAsStringAsync();
+            //var options = new JsonSerializerOptions()
+            //{
+            //    PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            //};
+            //var surfboard = JsonSerializer.Deserialize<List<Rental>>(jsonRespone, options);
 
             //if (_context.Surfboard == null)
             //{
@@ -236,7 +276,7 @@ namespace SurfsUp.Controllers
             //    _context.Surfboard.Remove(surfboard);
             //}
 
-            await _context.SaveChangesAsync();
+            //await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
         #endregion

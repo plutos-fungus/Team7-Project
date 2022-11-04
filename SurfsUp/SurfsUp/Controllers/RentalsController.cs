@@ -98,7 +98,7 @@ namespace SurfsUp.Controllers
         {
             Rental r = new();
             r.SurfboardID = id;
-            globalId = id;
+            //globalId = id;
             return View(r);
         }
         #endregion
