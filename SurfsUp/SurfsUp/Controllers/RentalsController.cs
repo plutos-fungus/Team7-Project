@@ -92,18 +92,21 @@ namespace SurfsUp.Controllers
         }
         #endregion
 
-        #region Works With API
+        #region Works With API Rentals/Create/ID
         // GET: Rentals/Create
         public IActionResult Create(int id)
         {
+            //create is clicked on index moving the user to the create page
+            // instantiate a new rental with the given SurfboardID
             Rental r = new();
             r.SurfboardID = id;
             globalId = id;
+            //returns the new rental to the view layer
             return View(r);
         }
         #endregion
 
-        #region Works with API
+        #region Works with API Rentals/Create/rental
         // POST: Rentals/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
@@ -111,16 +114,21 @@ namespace SurfsUp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("ID,RentalDate,StartDate,EndDate,Email,SurfboardID")] Rental rental)
         {
+            // the statement checks if the given rental is a valid rental
             if (ModelState.IsValid)
             {
                 HttpClient client = new HttpClient();
                 using HttpResponseMessage response = await client.PostAsJsonAsync("https://localhost:7260/api/Rentals/", rental);
 
+                // the statements checks if the post wasn't a success, and redirects the user to the "CanNotRent" page if it failed
                 if (!response.IsSuccessStatusCode)
                 {
                     return RedirectToAction("CanNotRent");
                 }
 
+                // the code from line 130 - 155 finds the surfboard, which has been rented, -
+                // sets it's IsRented to true, and sends the change to the API -
+                // if it fails it redirects to "CanNotRent", if it succeeds it redirects to "/Home/Index"
                 using HttpResponseMessage SurfboardResponse = await client.GetAsync("https://localhost:7260/api/Surfboards/" + rental.SurfboardID);
 
                 SurfboardResponse.EnsureSuccessStatusCode();
@@ -148,6 +156,7 @@ namespace SurfsUp.Controllers
         }
         #endregion
 
+        // displays the "CanNotRent" view
         public IActionResult CanNotRent()
         {
             return View();
