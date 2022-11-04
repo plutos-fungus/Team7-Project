@@ -22,7 +22,7 @@ namespace SurfsUp.Controllers
             _context = context;
         }
 
-        #region Works With API (INDEX)
+        #region Index works With API
         // GET: Surfboards
         [Authorize(Policy = "RequiredAdminRole")]
         public async Task<IActionResult> Index()
@@ -44,7 +44,7 @@ namespace SurfsUp.Controllers
         }
         #endregion
 
-        #region Works With API (DETAILS)
+        #region Details works With API
         // GET: Surfboards/Details/5
         public async Task<IActionResult> Details(int? id)
         {
@@ -78,6 +78,7 @@ namespace SurfsUp.Controllers
         }
         #endregion
 
+        #region Creat works with API
         [Authorize(Policy = "RequiredAdminRole")]
         // GET: Surfboards/Create
         public IActionResult Create()
@@ -85,8 +86,9 @@ namespace SurfsUp.Controllers
             Surfboard s = new();
             return View();
         }
+        #endregion
 
-        #region Doesn't work
+        #region Create works with API
         /*
         * Doesn't work!!
         */
@@ -110,7 +112,7 @@ namespace SurfsUp.Controllers
         }
         #endregion
 
-        #region Works with API (EDIT)
+        #region Edit works with API
         // GET: Surfboards/Edit/5
         [Authorize(Policy = "RequiredAdminRole")]
         public async Task<IActionResult> Edit(int? id)
@@ -145,7 +147,7 @@ namespace SurfsUp.Controllers
         }
         #endregion
 
-        #region Works with API (EDIT)
+        #region Edit works with API
         /*
          * Not updated to API
          */
@@ -180,7 +182,7 @@ namespace SurfsUp.Controllers
             return View();
         }
 
-        #region Works with API (DELETE)
+        #region Delete works with API
         /*
          * Not updated to API
          */
@@ -217,7 +219,7 @@ namespace SurfsUp.Controllers
         }
         #endregion
 
-        #region Works with API (DELETE CONFIRMED)
+        #region Delete Confirmed works with API
         /*
          * Not updated to API
          */
@@ -233,28 +235,6 @@ namespace SurfsUp.Controllers
             {
                 return NotFound();
             }
-            
-            
-            
-            //response.EnsureSuccessStatusCode();
-            //var jsonRespone = await response.Content.ReadAsStringAsync();
-            //var options = new JsonSerializerOptions()
-            //{
-            //    PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-            //};
-            //var surfboard = JsonSerializer.Deserialize<List<Rental>>(jsonRespone, options);
-
-            //if (_context.Surfboard == null)
-            //{
-            //    return Problem("Entity set 'SurfsUpContext.Surfboard'  is null.");
-            //}
-            //var surfboard = await _context.Surfboard.FindAsync(id);
-            //if (surfboard != null)
-            //{
-            //    _context.Surfboard.Remove(surfboard);
-            //}
-
-            //await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
         #endregion
