@@ -15,11 +15,9 @@ namespace SurfsUp.Controllers
 {
     public class SurfboardsController : Controller
     {
-        private readonly ApplicationDbContext _context;
 
-        public SurfboardsController(ApplicationDbContext context)
+        public SurfboardsController()
         {
-            _context = context;
         }
 
         #region Index works With API
