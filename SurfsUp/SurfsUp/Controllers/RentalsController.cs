@@ -27,7 +27,7 @@ namespace SurfsUp.Controllers
         private HttpClient client;
         private readonly string APILink = @"https://localhost:7260/api/Rentals/";
 
-        public RentalsController(ApplicationDbContext context, SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager)
+        public RentalsController(SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager)
         {
             //_context = context;
             _signInManager = signInManager;
@@ -35,16 +35,29 @@ namespace SurfsUp.Controllers
             client = new HttpClient();
         }
 
-        public async Task<List<Rental>> ReturnRentalList(string NewAPILink)
+        public async Task<object> ReturnRentalOrRentalList(int? id)
         {
-            using HttpResponseMessage response = await client.GetAsync(NewAPILink);
+            string link = APILink;
+
+            if (id != null)
+            {
+                link += id;
+            }
+
+            using HttpResponseMessage response = await client.GetAsync(link);
             response.EnsureSuccessStatusCode();
-            var jsonRespone = await response.Content.ReadAsStringAsync();
+            var jsonResponse = await response.Content.ReadAsStringAsync();
             var options = new JsonSerializerOptions()
             {
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase
             };
-            return JsonSerializer.Deserialize<List<Rental>>(jsonRespone, options);
+
+            if (id == null)
+            {
+                return JsonSerializer.Deserialize<List<Rental>>(jsonResponse, options);
+            }
+            return JsonSerializer.Deserialize<Rental>(jsonResponse, options);
+
         }
 
         public async Task<List<Rental>> UserSpecificRental(List<Rental> rental)
@@ -64,11 +77,11 @@ namespace SurfsUp.Controllers
             return Rentals;
         }
 
-        #region Works With API
+        #region Index works With API
         // GET: Rentals
         public async Task<IActionResult> Index()
         {
-            var rental = await ReturnRentalList(APILink);
+            var rental = await ReturnRentalOrRentalList(null) as List<Rental>;
 
             if (this.User.IsInRole("Admin"))
             {
@@ -87,20 +100,7 @@ namespace SurfsUp.Controllers
         // GET: Rentals/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            HttpClient client = new HttpClient();
-            using HttpResponseMessage response = await client.GetAsync(APILink+id);
-            response.EnsureSuccessStatusCode();
-
-            var jsonRespone = await response.Content.ReadAsStringAsync();
-
-            var options = new JsonSerializerOptions()
-            {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-            };
-
-            var rental = JsonSerializer.Deserialize<Rental>(jsonRespone, options);
-
-            return View(rental);
+            return View(await ReturnRentalOrRentalList(id));
         }
         #endregion
 
