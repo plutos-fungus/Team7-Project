@@ -26,7 +26,7 @@ namespace SurfsUp.Controllers
         // GET: Surfboards
         [Authorize(Policy = "RequiredAdminRole")]
         public async Task<IActionResult> Index()
-        {
+        {   
             HttpClient client = new HttpClient();
             using HttpResponseMessage response = await client.GetAsync("https://localhost:7260/api/Surfboards/");
             response.EnsureSuccessStatusCode();
