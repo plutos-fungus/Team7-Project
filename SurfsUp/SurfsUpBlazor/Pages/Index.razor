@@ -45,13 +45,9 @@
                             @s.Price;
                         </td>
                         <td>
-                            @*@Html.DisplayFor(modelItem => item.Image)*@
-                            @*<img src="/Images/MahiMahi.png" style="width: 150px"/>*@
-                            @*@if(s.Image != ""){
-                                string str = Url.Content(s.Image);
-                                <img src="@s" style="width: 150px" alt="ImageNotFound"/>
-                            }*@
-                                
+                            @if(s.Image != ""){
+                                <img src="@s.Image" style="width: 150px" alt="ImageNotFound"/>
+                            }
                         </td>
                         @*<td>
                             <a href="@Url.Action("Create", "Rentals", new { id = item.ID})">Rent</a> |

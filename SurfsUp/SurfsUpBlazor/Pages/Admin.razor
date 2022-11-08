@@ -70,13 +70,10 @@
                 @Html.DisplayFor(modelItem => item.EquipmentTypes)
                 </td>*@
                     <td>
-                        @*@Html.DisplayFor(modelItem => item.Image)*@
-                        @*<img src="/Images/MahiMahi.png" style="width: 150px"/>*@
-                        @*@if (item.Image != "")
+                        @if (s.Image != "")
                         {
-                            string s = Url.Content(item.Image);
-                            <img src="@s" style="width: 150px" alt="ImageNotFound" />
-                        }*@
+                            <img src="@s.Image" style="width: 150px" alt="ImageNotFound" />
+                        }
 
                     </td>
 @*                    <td>
