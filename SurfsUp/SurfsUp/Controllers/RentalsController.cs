@@ -26,7 +26,8 @@ namespace SurfsUp.Controllers
         private readonly UserManager<IdentityUser> _userManager;
         private readonly SignInManager<IdentityUser> _signInManager;
         private HttpClient client;
-        private readonly string APILink = @"https://localhost:7260/api/Rentals/";
+        private readonly string APILinkRental = @"https://localhost:7260/api/Rentals/";
+        private readonly string APILinkSurfboard = @"https://localhost:7260/api/Surfboards/";
 
         public RentalsController(SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager)
         {
@@ -38,7 +39,7 @@ namespace SurfsUp.Controllers
 
         public async Task<object> ReturnRentalOrRentalList(int? id)
         {
-            string link = APILink;
+            string link = APILinkRental;
 
             if (id != null)
             {
@@ -58,7 +59,6 @@ namespace SurfsUp.Controllers
                 return JsonSerializer.Deserialize<List<Rental>>(jsonResponse, options);
             }
             return JsonSerializer.Deserialize<Rental>(jsonResponse, options);
-
         }
 
         public async Task<List<Rental>> UserSpecificRental(List<Rental> rental)
@@ -76,6 +76,23 @@ namespace SurfsUp.Controllers
                 }
             }
             return Rentals;
+        }
+
+        public async Task<Surfboard> ReturnSurfboardObject(int id)
+        {
+            using HttpResponseMessage SurfboardResponse = await client.GetAsync("https://localhost:7260/api/Surfboards/" + id);
+
+            SurfboardResponse.EnsureSuccessStatusCode();
+
+            var jsonResponse = await SurfboardResponse.Content.ReadAsStringAsync();
+
+            var options = new JsonSerializerOptions()
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            };
+
+            var Surfboard = JsonSerializer.Deserialize<Surfboard>(jsonResponse, options);
+            return Surfboard;
         }
 
         #region Index works With API
@@ -124,52 +141,35 @@ namespace SurfsUp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ID,RentalDate,StartDate,EndDate,Email,SurfboardID")] Rental rental)
+        public async Task<IActionResult> Create([Bind("ID,EndDate,Email,SurfboardID")] Rental rental)
         {
-            // the statement checks if the given rental is a valid rental
-            if (ModelState.IsValid)
+            using HttpResponseMessage response = await client.PostAsJsonAsync("https://localhost:7260/api/Rentals/", rental);
+            if (!response.IsSuccessStatusCode)
             {
-                HttpClient client = new HttpClient();
-                using HttpResponseMessage response = await client.PostAsJsonAsync("https://localhost:7260/api/Rentals/", rental);
-
-                // the statements checks if the post wasn't a success, and redirects the user to the "CanNotRent" page if it failed
-                if (!response.IsSuccessStatusCode)
-                {
-                    return RedirectToAction("CanNotRent");
-                }
-
-                // the code from line 130 - 155 finds the surfboard, which has been rented, -
-                // sets it's IsRented to true, and sends the change to the API -
-                // if it fails it redirects to "CanNotRent", if it succeeds it redirects to "/Home/Index"
-                using HttpResponseMessage SurfboardResponse = await client.GetAsync("https://localhost:7260/api/Surfboards/" + rental.SurfboardID);
-
-                SurfboardResponse.EnsureSuccessStatusCode();
-
-                var jsonRespone = await SurfboardResponse.Content.ReadAsStringAsync();
-
-                var options = new JsonSerializerOptions()
-                {
-                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-                };
-
-                var Surfboard = JsonSerializer.Deserialize<Surfboard>(jsonRespone, options);
-
-                Surfboard.IsRented = true;
-
-                using HttpResponseMessage SurfboardPutResponse = await client.PutAsJsonAsync("https://localhost:7260/api/Surfboards/" + Surfboard.ID, Surfboard);
-
-                if (!SurfboardPutResponse.IsSuccessStatusCode)
-                {
-                    return RedirectToAction("CanNotRent");
-                }
-                return Redirect("/Home/Index");
+                return RedirectToAction("CanNotRent");
+            }
+            var Surfboard = await ReturnSurfboardObject(rental.SurfboardID);
+            Surfboard.IsRented = true;
+            using HttpResponseMessage SurfboardPutResponse = await client.PutAsJsonAsync("https://localhost:7260/api/Surfboards/" + Surfboard.ID, Surfboard);
+            if (!SurfboardPutResponse.IsSuccessStatusCode)
+            {
+                return RedirectToAction("CanNotRent");
             }
             return Redirect("/Home/Index");
         }
         #endregion
 
-        // displays the "CanNotRent" view
         public IActionResult CanNotRent()
+        {
+            return View();
+        }
+
+        public IActionResult CanNotDelete()
+        {
+            return View();
+        }
+
+        public IActionResult CanNotEdit()
         {
             return View();
         }
@@ -182,18 +182,8 @@ namespace SurfsUp.Controllers
             {
                 return NotFound();
             }
-            HttpClient client = new HttpClient();
-            using HttpResponseMessage response = await client.GetAsync("https://localhost:7260/api/Rentals/" + id);
-            response.EnsureSuccessStatusCode();
 
-            var jsonRespone = await response.Content.ReadAsStringAsync();
-
-            var options = new JsonSerializerOptions()
-            {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-            };
-
-            var rental = JsonSerializer.Deserialize<Rental>(jsonRespone, options);
+            var rental = await ReturnRentalOrRentalList(id);
             if (rental == null)
             {
                 return NotFound();
@@ -208,42 +198,19 @@ namespace SurfsUp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ID,RentalDate,StartDate,EndDate,Email,SurfboardID")] Rental rental)
+        public async Task<IActionResult> Edit(int id, [Bind("ID,EndDate,Email,SurfboardID")] Rental rental)
         {
-
             if (id != rental.ID)
+            {
+                return RedirectToAction("CanNotDelete");
+            }
+
+            using HttpResponseMessage response = await client.PutAsJsonAsync("https://localhost:7260/api/Rentals/" + id, rental);
+            if (!response.IsSuccessStatusCode)
             {
                 return NotFound();
             }
-
-            if (ModelState.IsValid)
-            {
-                HttpClient client = new HttpClient();
-                using HttpResponseMessage response = await client.PutAsJsonAsync("https://localhost:7260/api/Rentals/" + id, rental);
-
-                if (!response.IsSuccessStatusCode)
-                {
-                    return NotFound();
-                }
-                //try
-                //{
-                //    _context.Update(rental);
-                //    await _context.SaveChangesAsync();
-                //}
-                //catch (DbUpdateConcurrencyException)
-                //{
-                //    if (!RentalExists(rental.ID))
-                //    {
-                //        return NotFound();
-                //    }
-                //    else
-                //    {
-                //        throw;
-                //    }
-                //}
-                return RedirectToAction(nameof(Index));
-            }
-            return View(rental);
+            return RedirectToAction("Index");
         }
         #endregion
 
@@ -252,28 +219,11 @@ namespace SurfsUp.Controllers
         //[HttpDelete]
         public async Task<IActionResult> Delete(int? id)
         {
-
             if (id == null)
             {
                 return NotFound();
             }
-            // creates a new client
-            HttpClient client = new HttpClient();
-            // the following code checks if the rental exists
-            using HttpResponseMessage response = await client.GetAsync("https://localhost:7260/api/Rentals/" + id);
-            if(!response.IsSuccessStatusCode)
-            {
-                return NotFound();
-            }
-
-            var jsonResponse = await response.Content.ReadAsStringAsync();
-            var options = new JsonSerializerOptions()
-            {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-            };
-
-            var rental = JsonSerializer.Deserialize<Rental>(jsonResponse, options);
-            return View(rental);
+            return View(await ReturnRentalOrRentalList(id));
         }
         #endregion Works With API
 
@@ -284,35 +234,13 @@ namespace SurfsUp.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             // this code block requests to delete a rental
-            HttpClient client = new HttpClient();
-            using HttpResponseMessage response = await client.DeleteAsync("https://localhost:7260/api/Rentals/"+id);
+            using HttpResponseMessage response = await client.DeleteAsync("https://localhost:7260/api/Rentals/" + id);
             if (!response.IsSuccessStatusCode)
             {
-                return NotFound();
+                return RedirectToAction("CanNotDelete");
             }
+            var Surfboard = await ReturnSurfboardObject(id);
 
-            var jsonResponse = await response.Content.ReadAsStringAsync();
-            var options = new JsonSerializerOptions()
-            {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-            };
-
-            
-            var rental = JsonSerializer.Deserialize<Rental>(jsonResponse, options);
-            // gets the rented surfboard fro
-            using HttpResponseMessage SurfboardResponse = await client.GetAsync("https://localhost:7260/api/Surfboards/" + rental.SurfboardID);
-
-            SurfboardResponse.EnsureSuccessStatusCode();
-
-            jsonResponse = await SurfboardResponse.Content.ReadAsStringAsync();
-
-            options = new JsonSerializerOptions()
-            {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-            };
-
-            var Surfboard = JsonSerializer.Deserialize<Surfboard>(jsonResponse, options);
-            // sets the IsRented property to false
             Surfboard.IsRented = false;
             // sends the updated surfboard to the Api, so it can be rented once again
             using HttpResponseMessage SurfboardPutResponse = await client.PutAsJsonAsync("https://localhost:7260/api/Surfboards/" + Surfboard.ID, Surfboard);
@@ -325,11 +253,5 @@ namespace SurfsUp.Controllers
         }
         #endregion
 
-        #region I have no idea what this is
-        //private bool RentalExists(int id)
-        //{
-        //    return (_context.Rental?.Any(e => e.ID == id)).GetValueOrDefault();
-        //}
-        #endregion
     }
 }
