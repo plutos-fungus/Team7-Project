@@ -1,13 +1,102 @@
 ﻿@page "/"
 @using SurfsUpLibrary;
-<PageTitle>Index</PageTitle>
+@inject HttpClient Http
+<PageTitle>Home</PageTitle>
 
-<h1>Hello, world!</h1>
+<h1>Surfs up</h1>
 
-Welcome to your new app.
+<div class="col-10">
+        <div class="text-center">
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>
+                            <a>Name</a>
+                        </th>
+                        <th>
+                            <a>BoardType</a>
+                        </th>
+                        @*<th>
+                            Length
+                        </th>
+                        <th>
+                            Width
+                        </th>
+                        <th>
+                            Thickness
+                        </th>
+                        <th>
+                            Volume
+                        </th>*@
+                        <th>
+                            <a>Price</a>
+                        </th>
+                        @*<th>
+                            EquipmentTypes
+                        </th>*@
+                        <th>
+                            Image
+                        </th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (Surfboard s in surfboards)
+                    {
+                        <tr>
+                            <td>
+                                @s.Name;
+                            </td>
+                            <td>
+                                @s.BoardType;
+                            </td>
+                            @*<td>
+                                @Html.DisplayFor(modelItem => item.Length)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Width)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Thickness)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Volume)
+                            </td>*@
+                            <td>
+                                @s.Price;
+                            </td>
+                            @*<td>
+                                @Html.DisplayFor(modelItem => item.EquipmentTypes)
+                            </td>*@
+                            <td>
+                                @*@Html.DisplayFor(modelItem => item.Image)*@
+                                @*<img src="/Images/MahiMahi.png" style="width: 150px"/>*@
+                                @*@if(s.Image != ""){
+                                    string str = Url.Content(s.Image);
+                                    <img src="@s" style="width: 150px" alt="ImageNotFound"/>
+                                }*@
+                                
+                            </td>
+                            @*<td>
+                                <a href="@Url.Action("Create", "Rentals", new { id = item.ID})">Rent</a> |
+                                <a asp-action="Details" asp-route-id="@item.ID">Details</a>
+                            </td>*@
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
 
 @code{
-    private List<Surfboard> surfboards;
+    private Surfboard[]? surfboards;
+    public string SearchString = String.Empty;
+    List<string> options = new List<string>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        surfboards = await Http.GetFromJsonAsync<Surfboard[]>("https://localhost:7260/api/Surfboards/");
+        options = surfboards.Select(s => s.Name).Distinct().ToList();
+    }
 }
