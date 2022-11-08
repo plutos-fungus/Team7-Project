@@ -12,7 +12,7 @@ using SurfsUp.Areas.Identity.Data;
 namespace SurfsUp.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20221108105912_InitialMigration")]
+    [Migration("20221108113732_InitialMigration")]
     partial class InitialMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

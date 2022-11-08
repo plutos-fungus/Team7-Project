@@ -27,6 +27,7 @@ namespace SurfsUp.Controllers
         private readonly SignInManager<IdentityUser> _signInManager;
         private HttpClient client;
         private readonly string APILink = @"https://localhost:7260/api/Rentals/";
+        private readonly string APILinkSurfboard = @"https://localhost:7260/api/Surfboards/";
 
         public RentalsController(SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager)
         {
@@ -275,27 +276,20 @@ namespace SurfsUp.Controllers
         {
             // this code block requests to delete a rental
             HttpClient client = new HttpClient();
-            using HttpResponseMessage response = await client.DeleteAsync("https://localhost:7260/api/Rentals/"+id);
+            using HttpResponseMessage response = await client.DeleteAsync("https://localhost:7260/api/Rentals/" + id);
             if (!response.IsSuccessStatusCode)
             {
                 return NotFound();
             }
 
-            var jsonResponse = await response.Content.ReadAsStringAsync();
-            var options = new JsonSerializerOptions()
-            {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-            };
-
-            var rental = JsonSerializer.Deserialize<Rental>(jsonResponse, options);
             // gets the rented surfboard fro
-            using HttpResponseMessage SurfboardResponse = await client.GetAsync("https://localhost:7260/api/Surfboards/" + rental.SurfboardID);
+            using HttpResponseMessage SurfboardResponse = await client.GetAsync("https://localhost:7260/api/Surfboards/" + id);
 
             SurfboardResponse.EnsureSuccessStatusCode();
 
-            jsonResponse = await SurfboardResponse.Content.ReadAsStringAsync();
+            var jsonResponse = await SurfboardResponse.Content.ReadAsStringAsync();
 
-            options = new JsonSerializerOptions()
+            var options = new JsonSerializerOptions()
             {
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase
             };
