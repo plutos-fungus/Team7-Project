@@ -182,18 +182,8 @@ namespace SurfsUp.Controllers
             {
                 return NotFound();
             }
-            HttpClient client = new HttpClient();
-            using HttpResponseMessage response = await client.GetAsync("https://localhost:7260/api/Rentals/" + id);
-            response.EnsureSuccessStatusCode();
 
-            var jsonRespone = await response.Content.ReadAsStringAsync();
-
-            var options = new JsonSerializerOptions()
-            {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-            };
-
-            var rental = JsonSerializer.Deserialize<Rental>(jsonRespone, options);
+            var rental = await ReturnRentalOrRentalList(id);
             if (rental == null)
             {
                 return NotFound();
