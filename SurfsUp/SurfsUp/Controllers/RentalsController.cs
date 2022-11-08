@@ -27,6 +27,7 @@ namespace SurfsUp.Controllers
         private readonly SignInManager<IdentityUser> _signInManager;
         private HttpClient client;
         private readonly string APILink = @"https://localhost:7260/api/Rentals/";
+        private readonly string APILinkSurfboard = @"https://localhost:7260/api/Surfboards/";
 
         public RentalsController(SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager)
         {
@@ -124,7 +125,7 @@ namespace SurfsUp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ID,RentalDate,StartDate,EndDate,Email,SurfboardID")] Rental rental)
+        public async Task<IActionResult> Create([Bind("ID,EndDate,Email,SurfboardID")] Rental rental)
         {
             // the statement checks if the given rental is a valid rental
             if (ModelState.IsValid)
@@ -182,18 +183,8 @@ namespace SurfsUp.Controllers
             {
                 return NotFound();
             }
-            HttpClient client = new HttpClient();
-            using HttpResponseMessage response = await client.GetAsync("https://localhost:7260/api/Rentals/" + id);
-            response.EnsureSuccessStatusCode();
 
-            var jsonRespone = await response.Content.ReadAsStringAsync();
-
-            var options = new JsonSerializerOptions()
-            {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-            };
-
-            var rental = JsonSerializer.Deserialize<Rental>(jsonRespone, options);
+            var rental = await ReturnRentalOrRentalList(id);
             if (rental == null)
             {
                 return NotFound();
@@ -210,40 +201,18 @@ namespace SurfsUp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("ID,RentalDate,StartDate,EndDate,Email,SurfboardID")] Rental rental)
         {
-
             if (id != rental.ID)
             {
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
-            {
-                HttpClient client = new HttpClient();
-                using HttpResponseMessage response = await client.PutAsJsonAsync("https://localhost:7260/api/Rentals/" + id, rental);
+            using HttpResponseMessage response = await client.PutAsJsonAsync("https://localhost:7260/api/Rentals/" + id, rental);
 
-                if (!response.IsSuccessStatusCode)
-                {
-                    return NotFound();
-                }
-                //try
-                //{
-                //    _context.Update(rental);
-                //    await _context.SaveChangesAsync();
-                //}
-                //catch (DbUpdateConcurrencyException)
-                //{
-                //    if (!RentalExists(rental.ID))
-                //    {
-                //        return NotFound();
-                //    }
-                //    else
-                //    {
-                //        throw;
-                //    }
-                //}
-                return RedirectToAction(nameof(Index));
+            if (!response.IsSuccessStatusCode)
+            {
+                return NotFound();
             }
-            return View(rental);
+            return RedirectToAction("Index");
         }
         #endregion
 
@@ -285,28 +254,20 @@ namespace SurfsUp.Controllers
         {
             // this code block requests to delete a rental
             HttpClient client = new HttpClient();
-            using HttpResponseMessage response = await client.DeleteAsync("https://localhost:7260/api/Rentals/"+id);
+            using HttpResponseMessage response = await client.DeleteAsync("https://localhost:7260/api/Rentals/" + id);
             if (!response.IsSuccessStatusCode)
             {
                 return NotFound();
             }
 
-            var jsonResponse = await response.Content.ReadAsStringAsync();
-            var options = new JsonSerializerOptions()
-            {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-            };
-
-            
-            var rental = JsonSerializer.Deserialize<Rental>(jsonResponse, options);
             // gets the rented surfboard fro
-            using HttpResponseMessage SurfboardResponse = await client.GetAsync("https://localhost:7260/api/Surfboards/" + rental.SurfboardID);
+            using HttpResponseMessage SurfboardResponse = await client.GetAsync("https://localhost:7260/api/Surfboards/" + id);
 
             SurfboardResponse.EnsureSuccessStatusCode();
 
-            jsonResponse = await SurfboardResponse.Content.ReadAsStringAsync();
+            var jsonResponse = await SurfboardResponse.Content.ReadAsStringAsync();
 
-            options = new JsonSerializerOptions()
+            var options = new JsonSerializerOptions()
             {
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase
             };
@@ -325,11 +286,5 @@ namespace SurfsUp.Controllers
         }
         #endregion
 
-        #region I have no idea what this is
-        //private bool RentalExists(int id)
-        //{
-        //    return (_context.Rental?.Any(e => e.ID == id)).GetValueOrDefault();
-        //}
-        #endregion
     }
 }

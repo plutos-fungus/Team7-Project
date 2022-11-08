@@ -11,12 +11,6 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.RentalDate)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.StartDate)
-            </th>
-            <th>
                 @Html.DisplayNameFor(model => model.EndDate)
             </th>
             <th>
@@ -32,12 +26,6 @@
         @foreach (var item in Model)
         {
             <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.RentalDate)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.StartDate)
-                </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.EndDate)
                 </td>
