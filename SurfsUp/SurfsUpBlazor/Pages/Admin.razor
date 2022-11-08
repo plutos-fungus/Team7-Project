@@ -1,0 +1,109 @@
+﻿@page "/Admin"
+@using SurfsUpLibrary;
+@using System.Text.Json
+@inject HttpClient Http
+<PageTitle>Admin</PageTitle>
+
+<h1>Admin</h1>
+
+<div class="text-center">
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    <a>Name</a>
+                </th>
+                <th>
+                    <a>BoardType</a>
+                </th>
+                <th>
+                    <a>Price</a>
+                </th>
+                *<th>
+                Length
+                </th>
+                <th>
+                Width
+                </th>
+                <th>
+                Thickness
+                </th>
+                <th>
+                Volume
+                </th>
+                <th>
+                EquipmentTypes
+                </th>
+                <th>
+                    Image
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (Surfboard s in surfboards)
+            {
+                <tr>
+                    <td>
+                        @s.Name;
+                    </td>
+                    <td>
+                        @s.BoardType;
+                    </td>
+                    <td>
+                        @s.Price;
+                    </td>
+                    <td>
+                @s.Length
+                </td>
+                <td>
+                @s.Width
+                </td>
+                <td>
+                @s.Thickness
+                </td>
+                <td>
+                @s.Volume
+                </td>
+                    @*<td>
+                @Html.DisplayFor(modelItem => item.EquipmentTypes)
+                </td>*@
+                    <td>
+                        @*@Html.DisplayFor(modelItem => item.Image)*@
+                        @*<img src="/Images/MahiMahi.png" style="width: 150px"/>*@
+                        @*@if (item.Image != "")
+                        {
+                            string s = Url.Content(item.Image);
+                            <img src="@s" style="width: 150px" alt="ImageNotFound" />
+                        }*@
+
+                    </td>
+@*                    <td>
+                        <a href="@Url.Action("Create", "Rentals", new { id = item.ID})">Rent</a> |
+                        <a asp-action="Details" asp-route-id="@item.ID">Details</a>
+                    </td>*@
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+@code {
+    private List<Surfboard>? surfboards;
+    public string SearchString = String.Empty;
+    List<string> options = new List<string>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        using HttpResponseMessage response = await Http.GetAsync("https://localhost:7260/api/Surfboards/");
+        response.EnsureSuccessStatusCode();
+        var jsonRespone = await response.Content.ReadAsStringAsync();
+        var options = new JsonSerializerOptions()
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            };
+        var Surfboard = JsonSerializer.Deserialize<List<Surfboard>>(jsonRespone, options);
+        surfboards = Surfboard;
+        //options = surfboards.Select(s => s.Name).Distinct().ToList();
+    }
+}

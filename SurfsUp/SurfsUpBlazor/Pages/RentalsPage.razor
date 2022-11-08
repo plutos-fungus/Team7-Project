@@ -1,0 +1,90 @@
+﻿@page "/RentalsPage"
+@using SurfsUpLibrary;
+@using System.Text.Json
+@inject HttpClient Http
+<PageTitle>Rentals</PageTitle>
+
+<h1>Rentals</h1>
+
+<div class="text-center">
+    @if(rentals == null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else
+    {
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>
+                        <a>RentalDate</a>
+                    </th>
+                    <th>
+                        <a>StartDate</a>)
+                    </th>
+                    <th>
+                        <a>EndDate</a>
+                    </th>
+                    <th>
+                        <a>Email</a>
+                    </th>
+                    <th>
+                        <a>SurfboardID</a>
+                    </th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (Rental r in rentals)
+                {
+                    <tr>
+                        <td>
+                            @r.RentalDate
+                        </td>
+                        <td>
+                            @r.StartDate
+                        </td>
+                        <td>
+                            @r.EndDate
+                        </td>
+                        <td>
+                            @r.Email
+                        </td>
+                        <td>
+                            @r.SurfboardID
+                        </td>
+@*                        <td>
+                            <a asp-action="Edit" asp-route-id="@item.ID">Edit</a> |
+                            <a asp-action="Details" asp-route-id="@item.ID">Details</a> |
+                            <a asp-action="Delete" asp-route-id="@item.ID">Delete</a>
+                        </td>*@
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>
+
+
+@code {
+
+    private List<Rental>? rentals;
+    public string SearchString = String.Empty;
+    List<string> options = new List<string>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        using HttpResponseMessage response = await Http.GetAsync("https://localhost:7260/api/Rentals/");
+        response.EnsureSuccessStatusCode();
+        var jsonRespone = await response.Content.ReadAsStringAsync();
+        var options = new JsonSerializerOptions()
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            };
+        var Rentals = JsonSerializer.Deserialize<List<Rental>>(jsonRespone, options);
+        rentals = Rentals;
+        //options = rentals.Select(s => s.Name).Distinct().ToList();
+    }
+
+
+}
