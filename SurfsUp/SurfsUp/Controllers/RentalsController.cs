@@ -78,6 +78,23 @@ namespace SurfsUp.Controllers
             return Rentals;
         }
 
+        public async Task<Surfboard> ReturnSurfboardObject(int id)
+        {
+            using HttpResponseMessage SurfboardResponse = await client.GetAsync("https://localhost:7260/api/Surfboards/" + id);
+
+            SurfboardResponse.EnsureSuccessStatusCode();
+
+            var jsonResponse = await SurfboardResponse.Content.ReadAsStringAsync();
+
+            var options = new JsonSerializerOptions()
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            };
+
+            var Surfboard = JsonSerializer.Deserialize<Surfboard>(jsonResponse, options);
+            return Surfboard;
+        }
+
         #region Index works With API
         // GET: Rentals
         public async Task<IActionResult> Index()
@@ -126,50 +143,33 @@ namespace SurfsUp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("ID,EndDate,Email,SurfboardID")] Rental rental)
         {
-            // the statement checks if the given rental is a valid rental
-            if (ModelState.IsValid)
+            using HttpResponseMessage response = await client.PostAsJsonAsync("https://localhost:7260/api/Rentals/", rental);
+            if (!response.IsSuccessStatusCode)
             {
-                HttpClient client = new HttpClient();
-                using HttpResponseMessage response = await client.PostAsJsonAsync("https://localhost:7260/api/Rentals/", rental);
-
-                // the statements checks if the post wasn't a success, and redirects the user to the "CanNotRent" page if it failed
-                if (!response.IsSuccessStatusCode)
-                {
-                    return RedirectToAction("CanNotRent");
-                }
-
-                // the code from line 130 - 155 finds the surfboard, which has been rented, -
-                // sets it's IsRented to true, and sends the change to the API -
-                // if it fails it redirects to "CanNotRent", if it succeeds it redirects to "/Home/Index"
-                using HttpResponseMessage SurfboardResponse = await client.GetAsync("https://localhost:7260/api/Surfboards/" + rental.SurfboardID);
-
-                SurfboardResponse.EnsureSuccessStatusCode();
-
-                var jsonRespone = await SurfboardResponse.Content.ReadAsStringAsync();
-
-                var options = new JsonSerializerOptions()
-                {
-                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-                };
-
-                var Surfboard = JsonSerializer.Deserialize<Surfboard>(jsonRespone, options);
-
-                Surfboard.IsRented = true;
-
-                using HttpResponseMessage SurfboardPutResponse = await client.PutAsJsonAsync("https://localhost:7260/api/Surfboards/" + Surfboard.ID, Surfboard);
-
-                if (!SurfboardPutResponse.IsSuccessStatusCode)
-                {
-                    return RedirectToAction("CanNotRent");
-                }
-                return Redirect("/Home/Index");
+                return RedirectToAction("CanNotRent");
+            }
+            var Surfboard = await ReturnSurfboardObject(rental.SurfboardID);
+            Surfboard.IsRented = true;
+            using HttpResponseMessage SurfboardPutResponse = await client.PutAsJsonAsync("https://localhost:7260/api/Surfboards/" + Surfboard.ID, Surfboard);
+            if (!SurfboardPutResponse.IsSuccessStatusCode)
+            {
+                return RedirectToAction("CanNotRent");
             }
             return Redirect("/Home/Index");
         }
         #endregion
 
-        // displays the "CanNotRent" view
         public IActionResult CanNotRent()
+        {
+            return View();
+        }
+
+        public IActionResult CanNotDelete()
+        {
+            return View();
+        }
+
+        public IActionResult CanNotEdit()
         {
             return View();
         }
@@ -202,7 +202,7 @@ namespace SurfsUp.Controllers
         {
             if (id != rental.ID)
             {
-                return NotFound();
+                return RedirectToAction("CanNotDelete");
             }
 
             using HttpResponseMessage response = await client.PutAsJsonAsync("https://localhost:7260/api/Rentals/" + id, rental);
@@ -237,23 +237,10 @@ namespace SurfsUp.Controllers
             using HttpResponseMessage response = await client.DeleteAsync("https://localhost:7260/api/Rentals/" + id);
             if (!response.IsSuccessStatusCode)
             {
-                return NotFound();
+                return RedirectToAction("CanNotDelete");
             }
+            var Surfboard = await ReturnSurfboardObject(id);
 
-            // gets the rented surfboard fro
-            using HttpResponseMessage SurfboardResponse = await client.GetAsync("https://localhost:7260/api/Surfboards/" + id);
-
-            SurfboardResponse.EnsureSuccessStatusCode();
-
-            var jsonResponse = await SurfboardResponse.Content.ReadAsStringAsync();
-
-            var options = new JsonSerializerOptions()
-            {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-            };
-
-            var Surfboard = JsonSerializer.Deserialize<Surfboard>(jsonResponse, options);
-            // sets the IsRented property to false
             Surfboard.IsRented = false;
             // sends the updated surfboard to the Api, so it can be rented once again
             using HttpResponseMessage SurfboardPutResponse = await client.PutAsJsonAsync("https://localhost:7260/api/Surfboards/" + Surfboard.ID, Surfboard);
