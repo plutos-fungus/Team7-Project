@@ -12,8 +12,8 @@ using SurfsUp.Areas.Identity.Data;
 namespace SurfsUp.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20221104113418_RemovedRowVersion")]
-    partial class RemovedRowVersion
+    [Migration("20221108084846_NewMigration")]
+    partial class NewMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
