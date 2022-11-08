@@ -24,6 +24,8 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+
+builder.Services.AddCors(options => options.AddDefaultPolicy(policy => policy.WithOrigins().AllowAnyHeader().AllowAnyOrigin()));
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
@@ -39,6 +41,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseCors();
 app.UseHttpsRedirection();
 app.UseAuthentication();;
 
