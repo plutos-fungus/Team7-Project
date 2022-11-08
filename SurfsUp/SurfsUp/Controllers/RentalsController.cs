@@ -124,7 +124,7 @@ namespace SurfsUp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ID,RentalDate,StartDate,EndDate,Email,SurfboardID")] Rental rental)
+        public async Task<IActionResult> Create([Bind("ID,EndDate,Email,SurfboardID")] Rental rental)
         {
             // the statement checks if the given rental is a valid rental
             if (ModelState.IsValid)
@@ -287,7 +287,6 @@ namespace SurfsUp.Controllers
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase
             };
 
-            
             var rental = JsonSerializer.Deserialize<Rental>(jsonResponse, options);
             // gets the rented surfboard fro
             using HttpResponseMessage SurfboardResponse = await client.GetAsync("https://localhost:7260/api/Surfboards/" + rental.SurfboardID);
