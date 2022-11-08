@@ -201,40 +201,18 @@ namespace SurfsUp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("ID,RentalDate,StartDate,EndDate,Email,SurfboardID")] Rental rental)
         {
-
             if (id != rental.ID)
             {
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
-            {
-                HttpClient client = new HttpClient();
-                using HttpResponseMessage response = await client.PutAsJsonAsync("https://localhost:7260/api/Rentals/" + id, rental);
+            using HttpResponseMessage response = await client.PutAsJsonAsync("https://localhost:7260/api/Rentals/" + id, rental);
 
-                if (!response.IsSuccessStatusCode)
-                {
-                    return NotFound();
-                }
-                //try
-                //{
-                //    _context.Update(rental);
-                //    await _context.SaveChangesAsync();
-                //}
-                //catch (DbUpdateConcurrencyException)
-                //{
-                //    if (!RentalExists(rental.ID))
-                //    {
-                //        return NotFound();
-                //    }
-                //    else
-                //    {
-                //        throw;
-                //    }
-                //}
-                return RedirectToAction(nameof(Index));
+            if (!response.IsSuccessStatusCode)
+            {
+                return NotFound();
             }
-            return View(rental);
+            return RedirectToAction("Index");
         }
         #endregion
 
@@ -308,11 +286,5 @@ namespace SurfsUp.Controllers
         }
         #endregion
 
-        #region I have no idea what this is
-        //private bool RentalExists(int id)
-        //{
-        //    return (_context.Rental?.Any(e => e.ID == id)).GetValueOrDefault();
-        //}
-        #endregion
     }
 }
