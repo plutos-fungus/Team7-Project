@@ -155,20 +155,6 @@ namespace SurfsUp.Controllers
         }
         #endregion
 
-        public IActionResult CanNotRent()
-        {
-            return View();
-        }
-
-        public IActionResult CanNotDelete()
-        {
-            return View();
-        }
-
-        public IActionResult CanNotEdit()
-        {
-            return View();
-        }
 
         #region Works With API
         // GET: Rentals/Edit/5
@@ -249,5 +235,19 @@ namespace SurfsUp.Controllers
         }
         #endregion
 
+        public IActionResult CanNotRent()
+        {
+            return View();
+        }
+
+        public IActionResult CanNotDelete()
+        {
+            return View();
+        }
+
+        public IActionResult CanNotEdit()
+        {
+            return View();
+        }
     }
 }
