@@ -4,45 +4,46 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title">@Title</h4>
+                <h4 class="modal-title">Edit Board</h4>
                 <button type="button" class="close" @onclick="@ModalCancel">&times;</button>
             </div>
             <div class="modal-body">
                 <label>Name:</label>
-                <label>@Board.Name</label>
+                <input type="text" @bind="@Board.Name"/>
+                @*<label>@Board.Name</label>*@
                 <br />
                 <label>Boardtype:</label>
                 <label>@Board.BoardType</label>
                 <br />
                 <label>Price:</label>
-                <label>@Board.Price</label>
+                <input type="text" @bind="@Board.Price" />
+                @*<label>@Board.Price</label>*@
                 <br />
                 <label>Length:</label>
-                <label>@Board.Length</label>
+                <input type="text" @bind="@Board.Length" />
+                @*<label>@Board.Length</label>*@
                 <br />
                 <label>Thickness:</label>
-                <label>@Board.Thickness</label>
+                <input type="text" @bind="@Board.Thickness" />
+                @*<label>@Board.Thickness</label>*@
                 <br />
                 <label>Volume:</label>
-                <label>@Board.Volume</label>
+                <input type="text" @bind="@Board.Volume" />
+                @*<label>@Board.Volume</label>*@
                 <br />
                 <label>Equipment types:</label>
-                <label>@Board.EquipmentTypes</label>
+                <input type="text" @bind="@Board.EquipmentTypes" />
+                @*<label>@Board.EquipmentTypes</label>*@
                 <br />
                 <label>Image:</label>
-                @if (@Board.Image != "")
+                <input type="text" @bind="@Board.Image" />
+                @*@if (@Board.Image != "")
                 {
                     <img src="@Board.Image" style="width: 150px" alt="ImageNotFound" />
-                }
-                <br />
-                <label>End of rent:</label>
-                <input type="datetime" @bind="endDate"/>
-                <br />
-                <label>Email</label>
-                <input type="text" @bind="email"/>
+                }*@
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary" @onclick="@ModalOk">Rent</button>
+                <button type="button" class="btn btn-primary" @onclick="@ModalOk">Edit</button>
                 <button type="button" class="btn btn-primary" @onclick="@ModalCancel">Cancel</button>
             </div>
         </div>
@@ -51,19 +52,10 @@
 
 @code {
     [Parameter]
-    public string Title { get; set; }
-
-    [Parameter]
-    public string Text { get; set; }
-
-    [Parameter]
     public Surfboard Board { get; set; }
 
     [Parameter]
     public EventCallback<bool> OnClose { get; set; }
-
-    private DateTime endDate;
-    private string email;
 
     private Task ModalCancel()
     {
@@ -72,7 +64,7 @@
 
     private Task ModalOk()
     {
-        //Add code to create rental and post to API
+        //Add code to put changes to api
         return OnClose.InvokeAsync(true);
     }
 }

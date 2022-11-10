@@ -53,7 +53,7 @@
                         <td>
                             @*<a href="@Url.Action("Create", "Rentals", new { id = item.ID})">Rent</a> |
                             <a asp-action="Details" asp-route-id="@item.ID">Details</a>*@
-                            <RentDialog></RentDialog>
+                            <button type="button" class="btn btn-danger btn-sm" @onclick="() => OpenRentDialog(s)">Rent</button>
                         </td>
                     </tr>
                 }
@@ -61,10 +61,27 @@
         </table>
         }
     </div>
+@if (RentDialogOpen)
+{
+    <RentDialog Title="Surfboard" Text="Her the information will be" Board="@board" OnClose="@OnRentDialogClose"></RentDialog>
+}
 @code{
     private List<Surfboard>? surfboards;
+    private Surfboard board;
     public string SearchString = String.Empty;
     List<string> options = new List<string>();
+
+    public bool RentDialogOpen { get; set; }
+
+    private void OnRentDialogClose(bool accepted){
+        RentDialogOpen = false;
+        StateHasChanged();
+    }
+    private void OpenRentDialog(Surfboard surfboard){
+        board = surfboard;
+        RentDialogOpen = true;
+        StateHasChanged();
+    }
 
     protected override async Task OnInitializedAsync()
     {

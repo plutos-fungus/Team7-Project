@@ -1,5 +1,6 @@
 ﻿@page "/Admin"
 @using SurfsUpLibrary;
+@using SurfsUpBlazor.Components;
 @using System.Text.Json
 @inject HttpClient Http
 <PageTitle>Admin</PageTitle>
@@ -76,19 +77,58 @@
                         }
 
                     </td>
-@*                    <td>
-                        <a href="@Url.Action("Create", "Rentals", new { id = item.ID})">Rent</a> |
-                        <a asp-action="Details" asp-route-id="@item.ID">Details</a>
-                    </td>*@
+                    <td>
+                        @*<a href="@Url.Action("Create", "Rentals", new { id = item.ID})">Rent</a> |
+                        <a asp-action="Details" asp-route-id="@item.ID">Details</a>*@
+                        <button type="button" class="btn btn-danger btn-sm" @onclick="() => OpenEditBoardDialog(s)">Edit</button>
+                        <button type="button" class="btn btn-danger btn-sm" @onclick="() => OpenDeleteBoardDialog(s)">Delete</button>
+                    </td>
                 </tr>
             }
         </tbody>
     </table>
 </div>
+@if(EditBoardDialogOpen){
+    <EditBoardDialog Board="@board" OnClose="OnEditBoardDialogClose"></EditBoardDialog>
+}
+@if(DeleteBoardDialogOpen){
+    <DeleteBoardDialog Board="@board" OnClose="OnDeleteBoardDialogClose"></DeleteBoardDialog>
+}
+
+
 @code {
     private List<Surfboard>? surfboards;
+    private Surfboard board;
     public string SearchString = String.Empty;
     List<string> options = new List<string>();
+
+    public bool EditBoardDialogOpen { get; set; }
+
+    private void OnEditBoardDialogClose(bool accepted)
+    {
+        EditBoardDialogOpen = false;
+        StateHasChanged();
+    }
+    private void OpenEditBoardDialog(Surfboard surfboard)
+    {
+        board = surfboard;
+        EditBoardDialogOpen = true;
+        StateHasChanged();
+    }
+
+    public bool DeleteBoardDialogOpen { get; set; }
+
+    private void OnDeleteBoardDialogClose(bool accepted)
+    {
+        DeleteBoardDialogOpen = false;
+        StateHasChanged();
+    }
+    private void OpenDeleteBoardDialog(Surfboard surfboard)
+    {
+        board = surfboard;
+        DeleteBoardDialogOpen = true;
+        StateHasChanged();
+    }
 
     protected override async Task OnInitializedAsync()
     {
