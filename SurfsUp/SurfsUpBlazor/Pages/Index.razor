@@ -1,6 +1,7 @@
 ﻿@page "/"
 @using SurfsUpLibrary;
 @using System.Text.Json
+@using SurfsUpBlazor.Components;
 @inject HttpClient Http
 <PageTitle>Home</PageTitle>
 
@@ -52,7 +53,7 @@
                         <td>
                             @*<a href="@Url.Action("Create", "Rentals", new { id = item.ID})">Rent</a> |
                             <a asp-action="Details" asp-route-id="@item.ID">Details</a>*@
-                            
+                            <RentDialog></RentDialog>
                         </td>
                     </tr>
                 }

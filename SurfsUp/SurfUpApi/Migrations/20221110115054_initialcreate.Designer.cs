@@ -12,8 +12,8 @@ using SurfUpApi.Data;
 namespace SurfUpApi.Migrations
 {
     [DbContext(typeof(SurfUpApiContext))]
-    [Migration("20221108093943_Blazor")]
-    partial class Blazor
+    [Migration("20221110115054_initialcreate")]
+    partial class initialcreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
