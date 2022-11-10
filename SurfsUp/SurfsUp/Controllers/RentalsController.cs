@@ -120,7 +120,7 @@ namespace SurfsUp.Controllers
 
         #region Works With API Rentals/Create/ID
         // GET: Rentals/Create
-        public IActionResult Create(int id, byte[] rowVersion)
+        public IActionResult Create(int id)
         {
             //create is clicked on index moving the user to the create page
             // instantiate a new rental with the given SurfboardID
@@ -142,24 +142,16 @@ namespace SurfsUp.Controllers
             using HttpResponseMessage response = await client.PostAsJsonAsync(APILinkRental, rental);
             if (!response.IsSuccessStatusCode)
             {
-                var rented = _context.Surfboard.Where(s => s.ID == rental.SurfboardID).ToList();
-                // from Surfboard in _context.Surfboard
-                // where Surfboard.ID == globalId
-                // select Surfboard;
-                foreach (Surfboard surfboard in rented)
-                {
-                    surfboard.IsRented = true;
-                    _context.Update(surfboard);
-                }
-                _context.Add(rental);
-                await _context.SaveChangesAsync();
-                return Redirect("/Home/Index");
+                return RedirectToAction("CanNotRent");
             }
-            catch (Exception ex)
+            var Surfboard = await ReturnSurfboardObject(rental.SurfboardID);
+            Surfboard.IsRented = true;
+            using HttpResponseMessage SurfboardPutResponse = await client.PutAsJsonAsync(APILinkSurfboard + Surfboard.ID, Surfboard);
+            if (!SurfboardPutResponse.IsSuccessStatusCode)
             {
-                TempBool = false;
-                return Redirect($"/Home/CanNotRent/{id}");
+                return RedirectToAction("CanNotRent");
             }
+            return Redirect("/Home/Index");
         }
         #endregion
 
