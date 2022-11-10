@@ -3,19 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using SurfsUp.Areas.Identity.Data;
+using SurfUpApi.Data;
 
 #nullable disable
 
-namespace SurfsUp.Migrations
+namespace SurfUpApi.Migrations
 {
-    [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20220920095533_InitialCreate")]
-    partial class InitialCreate
+    [DbContext(typeof(SurfUpApiContext))]
+    partial class SurfUpApiContextModelSnapshot : ModelSnapshot
     {
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -222,7 +220,7 @@ namespace SurfsUp.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("SurfsUp.Models.Rental", b =>
+            modelBuilder.Entity("SurfUpApi.Models.Rental", b =>
                 {
                     b.Property<int>("ID")
                         .HasColumnType("int");
@@ -249,7 +247,7 @@ namespace SurfsUp.Migrations
                     b.ToTable("Rental");
                 });
 
-            modelBuilder.Entity("SurfsUp.Models.Surfboard", b =>
+            modelBuilder.Entity("SurfUpApi.Models.Surfboard", b =>
                 {
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd()
@@ -263,6 +261,9 @@ namespace SurfsUp.Migrations
                     b.Property<string>("EquipmentTypes")
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("IdentityUserId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Image")
                         .HasMaxLength(50)
@@ -282,6 +283,12 @@ namespace SurfsUp.Migrations
                     b.Property<double>("Price")
                         .HasColumnType("float");
 
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
                     b.Property<double>("Thickness")
                         .HasColumnType("float");
 
@@ -292,6 +299,8 @@ namespace SurfsUp.Migrations
                         .HasColumnType("float");
 
                     b.HasKey("ID");
+
+                    b.HasIndex("IdentityUserId");
 
                     b.ToTable("Surfboard");
                 });
@@ -345,6 +354,15 @@ namespace SurfsUp.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("SurfUpApi.Models.Surfboard", b =>
+                {
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "IdentityUser")
+                        .WithMany()
+                        .HasForeignKey("IdentityUserId");
+
+                    b.Navigation("IdentityUser");
                 });
 #pragma warning restore 612, 618
         }

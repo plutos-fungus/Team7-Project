@@ -5,15 +5,15 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using SurfsUp.Areas.Identity.Data;
+using SurfUpApi.Data;
 
 #nullable disable
 
-namespace SurfsUp.Migrations
+namespace SurfUpApi.Migrations
 {
-    [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20220923081157_InitaialCreateV2")]
-    partial class InitaialCreateV2
+    [DbContext(typeof(SurfUpApiContext))]
+    [Migration("20221011174640_initialcreate")]
+    partial class initialcreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -222,7 +222,7 @@ namespace SurfsUp.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("SurfsUp.Models.Rental", b =>
+            modelBuilder.Entity("SurfUpApi.Models.Rental", b =>
                 {
                     b.Property<int>("ID")
                         .HasColumnType("int");
@@ -249,7 +249,7 @@ namespace SurfsUp.Migrations
                     b.ToTable("Rental");
                 });
 
-            modelBuilder.Entity("SurfsUp.Models.Surfboard", b =>
+            modelBuilder.Entity("SurfUpApi.Models.Surfboard", b =>
                 {
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd()
@@ -358,7 +358,7 @@ namespace SurfsUp.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("SurfsUp.Models.Surfboard", b =>
+            modelBuilder.Entity("SurfUpApi.Models.Surfboard", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "IdentityUser")
                         .WithMany()
