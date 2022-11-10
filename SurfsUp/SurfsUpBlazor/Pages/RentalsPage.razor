@@ -1,5 +1,6 @@
 ﻿@page "/RentalsPage"
 @using SurfsUpLibrary;
+@using SurfsUpBlazor.Components;
 @using System.Text.Json
 @inject HttpClient Http
 <PageTitle>Rentals</PageTitle>
@@ -53,21 +54,30 @@
                         <td>
                             @r.SurfboardID
                         </td>
-@*                        <td>
-                            <a asp-action="Edit" asp-route-id="@item.ID">Edit</a> |
+                        <td>
+                            @*<a asp-action="Edit" asp-route-id="@item.ID">Edit</a> |
                             <a asp-action="Details" asp-route-id="@item.ID">Details</a> |
-                            <a asp-action="Delete" asp-route-id="@item.ID">Delete</a>
-                        </td>*@
+                            <a asp-action="Delete" asp-route-id="@item.ID">Delete</a>*@
+                            <button type="button" class="btn btn-danger btn-sm" @onclick="() => OpenEditRentalDialog(r)">Edit</button>
+                            <button type="button" class="btn btn-danger btn-sm" @onclick="() => OpenDeleteRentalDialog(r)">Delete</button>
+                        </td>
                     </tr>
                 }
             </tbody>
         </table>
     }
 </div>
-
+@if (EditRentalDialogOpen)
+{
+    <EditRentalDialog Rent="@rental" OnClose="OnEditRentalDialogClose"></EditRentalDialog>
+}
+@if (DeleteRentalDialogOpen)
+{
+    <DeleteRentalDialog Rent="@rental" OnClose="OnDeleteRentalDialogClose"></DeleteRentalDialog>
+}
 
 @code {
-
+    private Rental rental;
     private List<Rental>? rentals;
     public string SearchString = String.Empty;
     List<string> options = new List<string>();
@@ -85,6 +95,31 @@
         rentals = Rentals;
         //options = rentals.Select(s => s.Name).Distinct().ToList();
     }
+    public bool EditRentalDialogOpen { get; set; }
 
+    private void OnEditRentalDialogClose(bool accepted)
+    {
+        EditRentalDialogOpen = false;
+        StateHasChanged();
+    }
+    private void OpenEditRentalDialog(Rental rent)
+    {
+        rental = rent;
+        EditRentalDialogOpen = true;
+        StateHasChanged();
+    }
 
+    public bool DeleteRentalDialogOpen { get; set; }
+
+    private void OnDeleteRentalDialogClose(bool accepted)
+    {
+        DeleteRentalDialogOpen = false;
+        StateHasChanged();
+    }
+    private void OpenDeleteRentalDialog(Rental rent)
+    {
+        rental = rent;
+        DeleteRentalDialogOpen = true;
+        StateHasChanged();
+    }
 }

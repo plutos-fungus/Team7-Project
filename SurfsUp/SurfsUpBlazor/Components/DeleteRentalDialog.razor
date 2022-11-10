@@ -5,12 +5,12 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title">Delete Board</h4>
+                <h4 class="modal-title">Delete Rental</h4>
                 <button type="button" class="close" @onclick="@ModalCancel">&times;</button>
             </div>
             <div class="modal-body">
-                <p>@Board.Name</p>
-                <p>Are you sure you want to delete this board?</p>
+                <p>@Rent.ID</p>
+                <p>Are you sure you want to delete this rental?</p>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn" @onclick="@ModalCancel">Cancel</button>
@@ -22,7 +22,7 @@
 
 @code {
     [Parameter]
-    public Surfboard Board { get; set; }
+    public Rental Rent { get; set; }
 
     [Parameter]
     public EventCallback<bool> OnClose { get; set; }
@@ -35,7 +35,7 @@
     private async Task ModalOk()
     {
         HttpClient client = new HttpClient();
-        using HttpResponseMessage response = await client.DeleteAsync("https://localhost:7260/api/Surfboards/" + Board.ID);
+        using HttpResponseMessage response = await client.DeleteAsync("https://localhost:7260/api/Rentals/" + Rent.ID);
         response.EnsureSuccessStatusCode();
     }
 }

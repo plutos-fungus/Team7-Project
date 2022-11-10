@@ -6,7 +6,7 @@
 <PageTitle>Admin</PageTitle>
 
 <h1>Admin</h1>
-
+<button type="button" class="btn btn-primary" @onclick="() => OpenCreateBoardDialog()">Create new surfboard</button>
 <div class="text-center">
 
     <table class="table">
@@ -94,6 +94,10 @@
 @if(DeleteBoardDialogOpen){
     <DeleteBoardDialog Board="@board" OnClose="OnDeleteBoardDialogClose"></DeleteBoardDialog>
 }
+@if (CreateBoardDialogOpen)
+{
+    <CreateBoardDialog OnClose="OnCreateBoardDialogClose"></CreateBoardDialog>
+}
 
 
 @code {
@@ -127,6 +131,19 @@
     {
         board = surfboard;
         DeleteBoardDialogOpen = true;
+        StateHasChanged();
+    }
+
+    public bool CreateBoardDialogOpen { get; set; }
+
+    private void OnCreateBoardDialogClose(bool accepted)
+    {
+        CreateBoardDialogOpen = false;
+        StateHasChanged();
+    }
+    private void OpenCreateBoardDialog()
+    {
+        CreateBoardDialogOpen = true;
         StateHasChanged();
     }
 

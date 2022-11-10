@@ -5,12 +5,12 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title">Edit Board</h4>
+                <h4 class="modal-title">Create New Board</h4>
                 <button type="button" class="close" @onclick="@ModalCancel">&times;</button>
             </div>
             <div class="modal-body">
                 <label>Name:</label>
-                <input type="text" @bind="@Board.Name"/>
+                <input type="text" @bind="@Board.Name" />
                 @*<label>@Board.Name</label>*@
                 <br />
                 <label>Boardtype:</label>
@@ -40,11 +40,11 @@
                 <input type="text" @bind="@Board.Image" />
                 @*@if (@Board.Image != "")
                 {
-                    <img src="@Board.Image" style="width: 150px" alt="ImageNotFound" />
+                <img src="@Board.Image" style="width: 150px" alt="ImageNotFound" />
                 }*@
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary" @onclick="@ModalOk">Edit</button>
+                <button type="button" class="btn btn-primary" @onclick="@ModalOk">Create</button>
                 <button type="button" class="btn btn-primary" @onclick="@ModalCancel">Cancel</button>
             </div>
         </div>
@@ -52,8 +52,7 @@
 </div>
 
 @code {
-    [Parameter]
-    public Surfboard Board { get; set; }
+    public Surfboard Board { get; set; } = new Surfboard();
 
     [Parameter]
     public EventCallback<bool> OnClose { get; set; }
@@ -65,7 +64,8 @@
 
     private Task ModalOk()
     {
-        //Add code to put changes to api
+        //Add code to post new surfboard to api
+
         return OnClose.InvokeAsync(true);
     }
 }
