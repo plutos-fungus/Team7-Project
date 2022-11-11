@@ -1,11 +1,9 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
+using System;
 
-#nullable disable
-
-namespace SurfUpApi.Migrations
+namespace SurfUpBlazor.Server.Data.Migrations
 {
-    public partial class initialmigration : Migration
+    public partial class CreateIdentitySchema : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -49,19 +47,60 @@ namespace SurfUpApi.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Rental",
+                name: "DeviceCodes",
                 columns: table => new
                 {
-                    ID = table.Column<int>(type: "int", nullable: false),
-                    RentalDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    EndDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
-                    SurfboardID = table.Column<int>(type: "int", nullable: false)
+                    UserCode = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    DeviceCode = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    SubjectId = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
+                    SessionId = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
+                    ClientId = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
+                    CreationTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Expiration = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Data = table.Column<string>(type: "nvarchar(max)", maxLength: 52930, nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Rental", x => x.ID);
+                    table.PrimaryKey("PK_DeviceCodes", x => x.UserCode);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Keys",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Version = table.Column<int>(type: "int", nullable: false),
+                    Created = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Use = table.Column<string>(type: "nvarchar(450)", maxLength: 450, nullable: true),
+                    Algorithm = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    IsX509Certificate = table.Column<bool>(type: "bit", nullable: false),
+                    DataProtected = table.Column<bool>(type: "bit", nullable: false),
+                    Data = table.Column<string>(type: "nvarchar(max)", maxLength: 52930, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Keys", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PersistedGrants",
+                columns: table => new
+                {
+                    Key = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    Type = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    SubjectId = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
+                    SessionId = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
+                    ClientId = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
+                    CreationTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Expiration = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ConsumedTime = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    Data = table.Column<string>(type: "nvarchar(max)", maxLength: 52930, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PersistedGrants", x => x.Key);
                 });
 
             migrationBuilder.CreateTable(
@@ -110,8 +149,8 @@ namespace SurfUpApi.Migrations
                 name: "AspNetUserLogins",
                 columns: table => new
                 {
-                    LoginProvider = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    ProviderKey = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    LoginProvider = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
+                    ProviderKey = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
                     ProviderDisplayName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
@@ -155,8 +194,8 @@ namespace SurfUpApi.Migrations
                 columns: table => new
                 {
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    LoginProvider = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    LoginProvider = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
                     Value = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
@@ -168,34 +207,6 @@ namespace SurfUpApi.Migrations
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Surfboard",
-                columns: table => new
-                {
-                    ID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
-                    BoardType = table.Column<int>(type: "int", nullable: false),
-                    Length = table.Column<double>(type: "float", nullable: false),
-                    Width = table.Column<double>(type: "float", nullable: false),
-                    Thickness = table.Column<double>(type: "float", nullable: false),
-                    Volume = table.Column<double>(type: "float", nullable: false),
-                    Price = table.Column<double>(type: "float", nullable: false),
-                    EquipmentTypes = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    Image = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    IsRented = table.Column<bool>(type: "bit", nullable: false),
-                    IdentityUserId = table.Column<string>(type: "nvarchar(450)", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Surfboard", x => x.ID);
-                    table.ForeignKey(
-                        name: "FK_Surfboard_AspNetUsers_IdentityUserId",
-                        column: x => x.IdentityUserId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateIndex(
@@ -238,9 +249,40 @@ namespace SurfUpApi.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Surfboard_IdentityUserId",
-                table: "Surfboard",
-                column: "IdentityUserId");
+                name: "IX_DeviceCodes_DeviceCode",
+                table: "DeviceCodes",
+                column: "DeviceCode",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_DeviceCodes_Expiration",
+                table: "DeviceCodes",
+                column: "Expiration");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Keys_Use",
+                table: "Keys",
+                column: "Use");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PersistedGrants_ConsumedTime",
+                table: "PersistedGrants",
+                column: "ConsumedTime");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PersistedGrants_Expiration",
+                table: "PersistedGrants",
+                column: "Expiration");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PersistedGrants_SubjectId_ClientId_Type",
+                table: "PersistedGrants",
+                columns: new[] { "SubjectId", "ClientId", "Type" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PersistedGrants_SubjectId_SessionId_Type",
+                table: "PersistedGrants",
+                columns: new[] { "SubjectId", "SessionId", "Type" });
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -261,10 +303,13 @@ namespace SurfUpApi.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "Rental");
+                name: "DeviceCodes");
 
             migrationBuilder.DropTable(
-                name: "Surfboard");
+                name: "Keys");
+
+            migrationBuilder.DropTable(
+                name: "PersistedGrants");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
