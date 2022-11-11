@@ -7,13 +7,13 @@
 
 <h1>Surfs up</h1>
 
-    <div class="text-center">
-        @if(surfboards == null)
-        {
-            <p><em>Loading...</em></p>
-        }
-        else
-        {
+<div class="text-center">
+    @if (surfboards == null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else
+    {
         <table class="table">
             <thead>
                 <tr>
@@ -46,26 +46,27 @@
                             @s.Price;
                         </td>
                         <td>
-                            @if(s.Image != ""){
-                                <img src="@s.Image" style="width: 150px" alt="ImageNotFound"/>
+                            @if (s.Image != "")
+                            {
+                                <img src="@s.Image" style="width: 150px" alt="ImageNotFound" />
                             }
                         </td>
                         <td>
                             @*<a href="@Url.Action("Create", "Rentals", new { id = item.ID})">Rent</a> |
-                            <a asp-action="Details" asp-route-id="@item.ID">Details</a>*@
+                    <a asp-action="Details" asp-route-id="@item.ID">Details</a>*@
                             <button type="button" class="btn btn-danger btn-sm" @onclick="() => OpenRentDialog(s)">Rent</button>
                         </td>
                     </tr>
                 }
             </tbody>
         </table>
-        }
-    </div>
+    }
+</div>
 @if (RentDialogOpen)
 {
     <RentDialog Title="Surfboard" Text="Her the information will be" Board="@board" OnClose="@OnRentDialogClose"></RentDialog>
 }
-@code{
+@code {
     private List<Surfboard>? surfboards;
     private Surfboard board;
     public string SearchString = String.Empty;
@@ -73,11 +74,13 @@
 
     public bool RentDialogOpen { get; set; }
 
-    private void OnRentDialogClose(bool accepted){
+    private void OnRentDialogClose(bool accepted)
+    {
         RentDialogOpen = false;
         StateHasChanged();
     }
-    private void OpenRentDialog(Surfboard surfboard){
+    private void OpenRentDialog(Surfboard surfboard)
+    {
         board = surfboard;
         RentDialogOpen = true;
         StateHasChanged();
