@@ -25,7 +25,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 
-builder.Services.AddCors(options => options.AddDefaultPolicy(policy => policy.WithOrigins().AllowAnyHeader().AllowAnyOrigin()));
+builder.Services.AddCors(options => options.AddDefaultPolicy(policy => policy.WithOrigins().AllowAnyHeader().AllowAnyOrigin().AllowAnyMethod()));
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())

@@ -81,8 +81,6 @@
     private async void ApiCall()
     {
         Rental rental = new Rental();
-        rental.StartDate = DateTime.Now;
-        rental.RentalDate = DateTime.Now;
         rental.EndDate = endDate;
         rental.Email = email;
         rental.SurfboardID = Board.ID;

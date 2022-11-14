@@ -3,9 +3,9 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace SurfsUp.Migrations
+namespace SurfUpApi.Migrations
 {
-    public partial class fixlorttak : Migration
+    public partial class initialmigration : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -54,8 +54,6 @@ namespace SurfsUp.Migrations
                 {
                     ID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    RentalDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     EndDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Email = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
                     SurfboardID = table.Column<int>(type: "int", nullable: false)
@@ -187,7 +185,6 @@ namespace SurfsUp.Migrations
                     EquipmentTypes = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
                     Image = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
                     IsRented = table.Column<bool>(type: "bit", nullable: false),
-                    RowVersion = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false),
                     IdentityUserId = table.Column<string>(type: "nvarchar(450)", nullable: true)
                 },
                 constraints: table =>

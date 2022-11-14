@@ -12,8 +12,8 @@ using SurfUpApi.Data;
 namespace SurfUpApi.Migrations
 {
     [DbContext(typeof(SurfUpApiContext))]
-    [Migration("20221111105213_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20221114092716_initialmigration")]
+    partial class initialmigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -225,7 +225,10 @@ namespace SurfUpApi.Migrations
             modelBuilder.Entity("SurfUpApi.Models.Rental", b =>
                 {
                     b.Property<int>("ID")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"), 1L, 1);
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -233,12 +236,6 @@ namespace SurfUpApi.Migrations
                         .HasColumnType("nvarchar(255)");
 
                     b.Property<DateTime>("EndDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("RentalDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("SurfboardID")
