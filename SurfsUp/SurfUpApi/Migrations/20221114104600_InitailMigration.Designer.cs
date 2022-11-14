@@ -12,8 +12,8 @@ using SurfUpApi.Data;
 namespace SurfUpApi.Migrations
 {
     [DbContext(typeof(SurfUpApiContext))]
-    [Migration("20221114092716_initialmigration")]
-    partial class initialmigration
+    [Migration("20221114104600_InitailMigration")]
+    partial class InitailMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

@@ -1,6 +1,7 @@
 ﻿@inject HttpClient Http;
+@inject NavigationManager NavManager;
 @using SurfsUpLibrary;
-@using System.Text.Json
+@using System.Text.Json;
 
 
 <div class="modal fade show" id="myModal" style="display:block; background-color: rgba(10,10,10,.8);" aria-modal="true" role="dialog">
@@ -67,6 +68,7 @@
 
     private DateTime endDate;
     private string email;
+
 
     private Task ModalCancel()
     {

@@ -95,8 +95,11 @@
             {
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase
             };
-        var Surfboard = JsonSerializer.Deserialize<List<Surfboard>>(jsonRespone, options);
-        surfboards = Surfboard;
+        var Surfboards = JsonSerializer.Deserialize<List<Surfboard>>(jsonRespone, options);
+        surfboards = Surfboards.Where(s => s.IsRented == false).ToList();
+        
+
+
         //options = surfboards.Select(s => s.Name).Distinct().ToList();
     }
 }

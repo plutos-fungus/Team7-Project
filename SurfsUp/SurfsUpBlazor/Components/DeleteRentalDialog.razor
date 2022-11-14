@@ -1,5 +1,7 @@
 ﻿@inject HttpClient Http;
+@inject NavigationManager NavManager;
 @using SurfsUpLibrary;
+@using System.Text.Json;
 
 <div class="modal fade show" id="myModal" style="display:block; background-color: rgba(10,10,10,.8);" aria-modal="true" role="dialog">
     <div class="modal-dialog">
@@ -32,10 +34,35 @@
         return OnClose.InvokeAsync(false);
     }
 
-    private async Task ModalOk()
+    private Task ModalOk()
+    {
+        ApiDeleteRent();
+        return OnClose.InvokeAsync(true);
+    }
+
+    private async void ApiDeleteRent()
     {
         HttpClient client = new HttpClient();
         using HttpResponseMessage response = await client.DeleteAsync("https://localhost:7260/api/Rentals/" + Rent.ID);
         response.EnsureSuccessStatusCode();
+
+        using HttpResponseMessage SurfboardResponse = await Http.GetAsync("https://localhost:7260/api/Surfboards/" + Rent.SurfboardID);
+
+        SurfboardResponse.EnsureSuccessStatusCode();
+
+        var jsonRespone = await SurfboardResponse.Content.ReadAsStringAsync();
+
+        var options = new JsonSerializerOptions()
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            };
+
+        var Surfboard = JsonSerializer.Deserialize<Surfboard>(jsonRespone, options);
+
+        Surfboard.IsRented = false;
+
+        using HttpResponseMessage SurfboardPutResponse = await Http.PutAsJsonAsync("https://localhost:7260/api/Surfboards/" + Surfboard.ID, Surfboard);
+
+        SurfboardPutResponse.EnsureSuccessStatusCode();
     }
 }
