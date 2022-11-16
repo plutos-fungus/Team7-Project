@@ -1,0 +1,111 @@
+﻿@using SurfsUpLibrary.Weather;
+@using System.Text.Json;
+@inject HttpClient Http;
+
+@if(true){
+    GetWeatherForecast();
+}
+<div class="modal fade show" id="myModal" style="display:block; background-color: rgba(10,10,10,.8);" aria-modal="true" role="dialog">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Weather Forecast</h4>
+                <button type="button" class="close" @onclick="@ModalCancel">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="number" @bind="@numOfDays"/>
+                <button type="button" class="btn btn-primary" @onclick="GetWeatherForecast">Load</button>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Time</th>
+                            <th>Min. temperature</th>
+                            <th>Max. temperature</th>
+                            <th>Weather</th>
+                            <th>Description</th>
+                            <th>Icon</th>
+                            <th>Humidity</th>
+                            <th>POP</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach(List forecast in forecasts){
+                            <tr>
+                                <td>
+                                    @forecast.dt_txt
+                                </td>
+                                <td>
+                                    @forecast.main.temp_min
+                                </td>
+                                <td>
+                                    @forecast.main.temp_max
+                                </td>
+                                @foreach(Weather w in forecast.weather){
+                                    <td>
+                                        @w.main
+                                    </td>
+                                    <td>
+                                        @w.description
+                                    </td>
+                                    <td>
+                                        @if (true)
+                                        {
+                                            string s = "http://openweathermap.org/img/wn/" + w.icon + "@2x.png";
+                                            <img src="@s" alt="ImageNotFound" />
+                                        }
+                                    </td>
+                                }
+                                <td>
+                                    @forecast.main.humidity
+                                </td>
+                                <td>
+                                    @forecast.pop
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" @onclick="@ModalCancel">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+@code {
+    public Root root = new Root();
+    private List<List> forecasts = new List<List>();
+    private int numOfDays = 5;
+
+    [Parameter]
+    public EventCallback<bool> OnClose { get; set; }
+
+    private Task ModalCancel()
+    {
+        return OnClose.InvokeAsync(false);
+    }
+
+    public async void GetWeatherForecast(){
+        if(numOfDays < 1){
+            numOfDays = 1;
+        }else if(numOfDays > 5){
+            numOfDays = 5;
+        }
+        int count = numOfDays * 8;
+        using HttpResponseMessage response = await Http.GetAsync($"https://api.openweathermap.org/data/2.5/forecast?lat=55.39594&lon=10.38831&cnt={count}&appid=fe5e02383d8389c0ed719c4281aa7994&units=metric");
+        response.EnsureSuccessStatusCode();
+
+        var jsonResponse = await response.Content.ReadAsStringAsync();
+
+        var options = new JsonSerializerOptions()
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            };
+
+        root = JsonSerializer.Deserialize<Root>(jsonResponse, options);
+        forecasts = root.list;
+    }
+}

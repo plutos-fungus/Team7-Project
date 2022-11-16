@@ -7,6 +7,7 @@
 
 <h1>Rentals</h1>
 
+<button type="button" class="btn btn-danger btn-sm" @onclick="OpenWeatherForecastDialog">Weather Forecast</button>
 <div class="text-center">
     @if(rentals == null)
     {
@@ -63,6 +64,10 @@
 {
     <DeleteRentalDialog Rent="@rental" OnClose="OnDeleteRentalDialogClose"></DeleteRentalDialog>
 }
+@if (WeatherForecastDialogOpen)
+{
+    <WeatherForecast OnClose="@OnWeatherForecastDialogClose"></WeatherForecast>
+}
 
 @code {
     private Rental rental;
@@ -108,6 +113,19 @@
     {
         rental = rent;
         DeleteRentalDialogOpen = true;
+        StateHasChanged();
+    }
+
+    public bool WeatherForecastDialogOpen { get; set; }
+
+    private void OnWeatherForecastDialogClose(bool accepted)
+    {
+        WeatherForecastDialogOpen = false;
+        StateHasChanged();
+    }
+    private void OpenWeatherForecastDialog()
+    {
+        WeatherForecastDialogOpen = true;
         StateHasChanged();
     }
 }
