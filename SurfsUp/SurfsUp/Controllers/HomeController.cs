@@ -18,6 +18,12 @@ namespace SurfsUp.Controllers
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly UserManager<IdentityUser> _userManager;
 
+        private readonly string APILinkRentalsV1 = @"https://localhost:7260/api/v1/Rentals";
+        private readonly string APILinkRentalsV2 = @"https://localhost:7260/api/v2/Rentals";
+
+        private readonly string APILinkSurfboardsV1 = @"https://localhost:7260/api/v1/Surfboards/";
+        private readonly string APILinkSurfboardsV2 = @"https://localhost:7260/api/v2/Surfboards/";
+
         public HomeController(ILogger<HomeController> logger, ApplicationDbContext context, RoleManager<IdentityRole> roleManager, UserManager<IdentityUser> userManager)
         {
             _logger = logger;
@@ -26,17 +32,6 @@ namespace SurfsUp.Controllers
             _userManager = userManager;
 
         }
-
-        #region Some Commend
-        /*public async Task<IActionResult> Index()
-        {
-            // Checks for if the DateTime for the rented board is done (plz don't remove)
-            CheckAndDelete();
-            return _context.Surfboard != null ?
-                        View(await _context.Surfboard.Where(s => s.IsRented == false).ToListAsync()) :
-                        Problem("Entity set 'SurfsUpContext.Surfboard'  is null.");
-        }*/
-        #endregion
 
         #region Works With API
         public async Task<IActionResult> Index(string SortOrder, string currentFilter, string searchString, int? pageNumber)
@@ -61,7 +56,7 @@ namespace SurfsUp.Controllers
                     searchString = currentFilter;
                 }
 
-                using HttpResponseMessage response = await client.GetAsync("https://localhost:7260/api/Surfboards/");
+                using HttpResponseMessage response = await client.GetAsync(APILinkSurfboardsV1);
                 response.EnsureSuccessStatusCode();
                 var jsonRespone = await response.Content.ReadAsStringAsync();
                 var options = new JsonSerializerOptions()
@@ -114,7 +109,7 @@ namespace SurfsUp.Controllers
                     searchString = currentFilter;
                 }
 
-                using HttpResponseMessage response = await client.GetAsync("https://localhost:7260/api/Surfboards/");
+                using HttpResponseMessage response = await client.GetAsync(APILinkSurfboardsV2);
                 response.EnsureSuccessStatusCode();
                 var jsonRespone = await response.Content.ReadAsStringAsync();
                 var options = new JsonSerializerOptions()
@@ -152,15 +147,6 @@ namespace SurfsUp.Controllers
         }
         #endregion
 
-        #region Some Comment
-        /*public async Task<IActionResult> Index(Surfboard.BoardTypes b)
-        {
-            return _context.Surfboard != null ?
-                        View(await _context.Surfboard.Where(s => s.IsRented == false && s.BoardType == b).ToListAsync()) :
-                        Problem("Entity set 'SurfsUpContext.Surfboard'  is null.");
-        }*/
-        #endregion
-
         public IActionResult Privacy()
         {
             return View();
@@ -170,7 +156,7 @@ namespace SurfsUp.Controllers
         public async Task<IActionResult> Details(int? id)
         {
             HttpClient client = new HttpClient();
-            using HttpResponseMessage response = await client.GetAsync("https://localhost:7260/api/Surfboards/" + id);
+            using HttpResponseMessage response = await client.GetAsync(APILinkSurfboardsV1 + id);
             response.EnsureSuccessStatusCode();
 
             var jsonRespone = await response.Content.ReadAsStringAsync();
@@ -183,31 +169,7 @@ namespace SurfsUp.Controllers
             var surfboard = JsonSerializer.Deserialize<Surfboard>(jsonRespone, options);
 
             return View(surfboard);
-            //if (id == null || _context.Surfboard == null)
-            //{
-            //    return NotFound();
-            //}
-
-            //var surfboard = await _context.Surfboard
-            //    .FirstOrDefaultAsync(m => m.ID == id);
-            //if (surfboard == null)
-            //{
-            //    return NotFound();
-            //}
-
-            //return View(surfboard);
         }
-        #endregion
-
-        #region Some Comment
-        /*
-         * Works????
-         */
-        //[ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        //public IActionResult Error()
-        //{
-        //    return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-        //}
         #endregion
 
         #region Works With API
@@ -215,7 +177,7 @@ namespace SurfsUp.Controllers
         {
             DateTime nowDate = DateTime.Now;
             HttpClient client = new HttpClient();
-            using HttpResponseMessage response = await client.GetAsync("https://localhost:7260/api/Rentals/");
+            using HttpResponseMessage response = await client.GetAsync(APILinkRentalsV1);
             response.EnsureSuccessStatusCode();
 
             var jsonRespone = await response.Content.ReadAsStringAsync();
@@ -230,7 +192,7 @@ namespace SurfsUp.Controllers
             var rentCheck = rental.ToList();
 
             client = new HttpClient();
-            using HttpResponseMessage surfResponse = await client.GetAsync("https://localhost:7260/api/Surfboards/");
+            using HttpResponseMessage surfResponse = await client.GetAsync(APILinkSurfboardsV1);
             surfResponse.EnsureSuccessStatusCode();
             var surfJsonRespone = await response.Content.ReadAsStringAsync();
             options = new JsonSerializerOptions()
@@ -255,20 +217,15 @@ namespace SurfsUp.Controllers
                         {
                             surfboard.IsRented = false;
                             client = new HttpClient();
-                            using HttpResponseMessage tempResponse = await client.PutAsJsonAsync("https://localhost:7260/api/Rentals/" + rent.ID, rent);
-                            using HttpResponseMessage temp2Response = await client.PutAsJsonAsync("https://localhost:7260/api/Rentals/" + surfboard.ID, surfboard);
+                            using HttpResponseMessage tempResponse = await client.PutAsJsonAsync(APILinkRentalsV1 + rent.ID, rent);
+                            using HttpResponseMessage temp2Response = await client.PutAsJsonAsync(APILinkRentalsV1 + surfboard.ID, surfboard);
 
                             if (!tempResponse.IsSuccessStatusCode && !temp2Response.IsSuccessStatusCode)
                             {
                                 //return NotFound();
                             }
-                            //surfboard.IsRented = false;
-                            //_context.Surfboard.Update(surfboard);
-                            //_context.Rental.Remove(rent);
                         }
                     }
-                    //Update Rental.SurfboardId
-                    //_context.SaveChanges();
                 }
 
             }
