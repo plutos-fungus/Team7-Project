@@ -1,5 +1,6 @@
 ﻿@inject HttpClient Http;
 @inject NavigationManager NavManager;
+@inject NavigationManager uriHelper;
 @using SurfsUpLibrary;
 @using System.Text.Json;
 
@@ -64,5 +65,7 @@
         using HttpResponseMessage SurfboardPutResponse = await Http.PutAsJsonAsync("https://localhost:7260/api/Surfboards/" + Surfboard.ID, Surfboard);
 
         SurfboardPutResponse.EnsureSuccessStatusCode();
+
+        uriHelper.NavigateTo(uriHelper.Uri, forceLoad: true);
     }
 }

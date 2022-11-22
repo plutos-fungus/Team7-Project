@@ -1,4 +1,5 @@
 ﻿@inject HttpClient Http;
+@inject NavigationManager uriHelper;
 @using SurfsUpLibrary;
 
 <div class="modal fade show" id="myModal" style="display:block; background-color: rgba(10,10,10,.8);" aria-modal="true" role="dialog">
@@ -30,6 +31,10 @@
                 <br />
                 <label>Volume:</label>
                 <input type="text" @bind="@Board.Volume" />
+                @*<label>@Board.Volume</label>*@
+                <br />
+                <label>Width:</label>
+                <input type="text" @bind="@Board.Width" />
                 @*<label>@Board.Volume</label>*@
                 <br />
                 <label>Equipment types:</label>
@@ -64,8 +69,17 @@
 
     private Task ModalOk()
     {
-        //Add code to post new surfboard to api
+        ApiCallCreateBoard();
 
         return OnClose.InvokeAsync(true);
+    }
+
+    private async void ApiCallCreateBoard()
+    {
+        HttpClient client = new HttpClient();
+        using HttpResponseMessage response = await client.PostAsJsonAsync("https://localhost:7260/api/Surfboards/", Board);
+        response.EnsureSuccessStatusCode();
+
+        uriHelper.NavigateTo(uriHelper.Uri, forceLoad: true);
     }
 }

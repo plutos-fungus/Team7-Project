@@ -19,13 +19,13 @@
             <thead>
                 <tr>
                     <th>
+                        <a>Name</a>
+                    </th>
+                    <th>
                         <a>RentalDate</a>
                     </th>
                     <th>
                         <a>Email</a>
-                    </th>
-                    <th>
-                        <a>SurfboardID</a>
                     </th>
                     <th></th>
                 </tr>
@@ -33,33 +33,34 @@
             <tbody>
                 @foreach (Rental r in rentals)
                 {
-                    <tr>
-                        <td>
-                            @r.EndDate
-                        </td>
-                        <td>
-                            @r.Email
-                        </td>
-                        <td>
-                            @r.SurfboardID
-                        </td>
-                        <td>
-                            @*<a asp-action="Edit" asp-route-id="@item.ID">Edit</a> |
-                            <a asp-action="Details" asp-route-id="@item.ID">Details</a> |
-                            <a asp-action="Delete" asp-route-id="@item.ID">Delete</a>*@
-                            <button type="button" class="btn btn-danger btn-sm" @onclick="() => OpenEditRentalDialog(r)">Edit</button>
-                            <button type="button" class="btn btn-danger btn-sm" @onclick="() => OpenDeleteRentalDialog(r)">Delete</button>
-                        </td>
-                    </tr>
+                    @foreach (Surfboard s in boards)
+                    {
+                        @if(s.ID == r.SurfboardID)
+                        {
+                            <tr>
+                                <td>
+                                    @s.Name
+                                </td>
+                                <td>
+                                    @r.EndDate
+                                </td>
+                                <td>
+                                    @r.Email
+                                </td>
+                                <td>
+                                    @*<a asp-action="Edit" asp-route-id="@item.ID">Edit</a> |
+                                    <a asp-action="Details" asp-route-id="@item.ID">Details</a> |
+                                    <a asp-action="Delete" asp-route-id="@item.ID">Delete</a>*@
+                                    <button type="button" class="btn btn-danger btn-sm" @onclick="() => OpenDeleteRentalDialog(r)">Delete</button>
+                                </td>
+                            </tr>
+                        }
+                    }
                 }
             </tbody>
         </table>
     }
 </div>
-@if (EditRentalDialogOpen)
-{
-    <EditRentalDialog Rent="@rental" OnClose="OnEditRentalDialogClose"></EditRentalDialog>
-}
 @if (DeleteRentalDialogOpen)
 {
     <DeleteRentalDialog Rent="@rental" OnClose="OnDeleteRentalDialogClose"></DeleteRentalDialog>
@@ -70,6 +71,7 @@
 }
 
 @code {
+    private List<Surfboard> boards;
     private Rental rental;
     private List<Rental>? rentals;
     public string SearchString = String.Empty;
@@ -87,6 +89,15 @@
         var Rentals = JsonSerializer.Deserialize<List<Rental>>(jsonRespone, options);
         rentals = Rentals;
         //options = rentals.Select(s => s.Name).Distinct().ToList();
+        using HttpResponseMessage SurfboardResponse = await Http.GetAsync("https://localhost:7260/api/Surfboards/");
+        response.EnsureSuccessStatusCode();
+        jsonRespone = await SurfboardResponse.Content.ReadAsStringAsync();
+        options = new JsonSerializerOptions()
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            };
+        var Surfboards = JsonSerializer.Deserialize<List<Surfboard>>(jsonRespone, options);
+        boards = Surfboards;
     }
     public bool EditRentalDialogOpen { get; set; }
 

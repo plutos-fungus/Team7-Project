@@ -1,4 +1,5 @@
 ﻿@inject HttpClient Http;
+@inject NavigationManager uriHelper;
 @using SurfsUpLibrary;
 
 <div class="modal fade show" id="myModal" style="display:block; background-color: rgba(10,10,10,.8);" aria-modal="true" role="dialog">
@@ -32,10 +33,18 @@
         return OnClose.InvokeAsync(false);
     }
 
-    private async Task ModalOk()
+    private Task ModalOk()
+    {
+        ApiDeleteBoard();
+        return OnClose.InvokeAsync(true);
+    }
+
+    private async void ApiDeleteBoard()
     {
         HttpClient client = new HttpClient();
         using HttpResponseMessage response = await client.DeleteAsync("https://localhost:7260/api/Surfboards/" + Board.ID);
         response.EnsureSuccessStatusCode();
+
+        uriHelper.NavigateTo(uriHelper.Uri, forceLoad: true);
     }
 }
