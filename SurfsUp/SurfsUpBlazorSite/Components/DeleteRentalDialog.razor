@@ -1,0 +1,71 @@
+﻿@inject HttpClient Http;
+@inject NavigationManager NavManager;
+@inject NavigationManager uriHelper;
+@using SurfsUpLibrary;
+@using System.Text.Json;
+
+<div class="modal fade show" id="myModal" style="display:block; background-color: rgba(10,10,10,.8);" aria-modal="true" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Delete Rental</h4>
+                <button type="button" class="close" @onclick="@ModalCancel">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>@Rent.ID</p>
+                <p>Are you sure you want to delete this rental?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn" @onclick="@ModalCancel">Cancel</button>
+                <button type="button" class="btn btn-danger" @onclick=@ModalOk>Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public Rental Rent { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> OnClose { get; set; }
+
+    private Task ModalCancel()
+    {
+        return OnClose.InvokeAsync(false);
+    }
+
+    private Task ModalOk()
+    {
+        ApiDeleteRent();
+        return OnClose.InvokeAsync(true);
+    }
+
+    private async void ApiDeleteRent()
+    {
+        HttpClient client = new HttpClient();
+        using HttpResponseMessage response = await client.DeleteAsync("https://localhost:7260/api/Rentals/" + Rent.ID);
+        response.EnsureSuccessStatusCode();
+
+        using HttpResponseMessage SurfboardResponse = await Http.GetAsync("https://localhost:7260/api/Surfboards/" + Rent.SurfboardID);
+
+        SurfboardResponse.EnsureSuccessStatusCode();
+
+        var jsonRespone = await SurfboardResponse.Content.ReadAsStringAsync();
+
+        var options = new JsonSerializerOptions()
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            };
+
+        var Surfboard = JsonSerializer.Deserialize<Surfboard>(jsonRespone, options);
+
+        Surfboard.IsRented = false;
+
+        using HttpResponseMessage SurfboardPutResponse = await Http.PutAsJsonAsync("https://localhost:7260/api/Surfboards/" + Surfboard.ID, Surfboard);
+
+        SurfboardPutResponse.EnsureSuccessStatusCode();
+
+        uriHelper.NavigateTo(uriHelper.Uri, forceLoad: true);
+    }
+}

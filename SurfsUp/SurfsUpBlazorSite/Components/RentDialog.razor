@@ -1,0 +1,116 @@
+﻿@inject HttpClient Http;
+@inject NavigationManager NavManager;
+@inject NavigationManager uriHelper;
+@using SurfsUpLibrary;
+@using System.Text.Json;
+
+<div class="modal fade show" id="myModal" style="display:block; background-color: rgba(10,10,10,.8);" aria-modal="true" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">@Title</h4>
+                <button type="button" class="close" @onclick="@ModalCancel">&times;</button>
+            </div>
+            <div class="modal-body">
+                <label>Name:</label>
+                <label>@Board.Name</label>
+                <br />
+                <label>Boardtype:</label>
+                <label>@Board.BoardType</label>
+                <br />
+                <label>Price:</label>
+                <label>@Board.Price</label>
+                <br />
+                <label>Length:</label>
+                <label>@Board.Length</label>
+                <br />
+                <label>Thickness:</label>
+                <label>@Board.Thickness</label>
+                <br />
+                <label>Volume:</label>
+                <label>@Board.Volume</label>
+                <br />
+                <label>Equipment types:</label>
+                <label>@Board.EquipmentTypes</label>
+                <br />
+                <label>Image:</label>
+                @if (@Board.Image != "")
+                {
+                    <img src="@Board.Image" style="width: 150px" alt="ImageNotFound" />
+                }
+                <br />
+                <label>End of rent:</label>
+                <input type="datetime" @bind="endDate"/>
+                <br />
+                <label>Email</label>
+                <input type="text" @bind="email"/>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" @onclick="@ModalOk">Rent</button>
+                <button type="button" class="btn btn-primary" @onclick="@ModalCancel">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public string Title { get; set; }
+
+    [Parameter]
+    public string Text { get; set; }
+
+    [Parameter]
+    public Surfboard Board { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> OnClose { get; set; }
+
+    private DateTime endDate;
+    private string email;
+
+
+    private Task ModalCancel()
+    {
+        return OnClose.InvokeAsync(false);
+    }
+
+    private Task ModalOk()
+    {
+        ApiCall();
+        return OnClose.InvokeAsync(true);
+    }
+    private async void ApiCall()
+    {
+        Rental rental = new Rental();
+        rental.EndDate = endDate;
+        rental.Email = email;
+        rental.SurfboardID = Board.ID;
+        using HttpResponseMessage response = await Http.PostAsJsonAsync("https://localhost:7260/api/Rentals/", rental);
+
+        // the statements checks if the post wasn't a success, and redirects the user to the "CanNotRent" page if it failed
+        response.EnsureSuccessStatusCode();
+
+       
+        using HttpResponseMessage SurfboardResponse = await Http.GetAsync("https://localhost:7260/api/Surfboards/" + rental.SurfboardID);
+
+        SurfboardResponse.EnsureSuccessStatusCode();
+
+        var jsonRespone = await SurfboardResponse.Content.ReadAsStringAsync();
+
+        var options = new JsonSerializerOptions()
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            };
+
+        var Surfboard = JsonSerializer.Deserialize<Surfboard>(jsonRespone, options);
+
+        Surfboard.IsRented = true;
+
+        using HttpResponseMessage SurfboardPutResponse = await Http.PutAsJsonAsync("https://localhost:7260/api/Surfboards/" + Surfboard.ID, Surfboard);
+
+        SurfboardPutResponse.EnsureSuccessStatusCode();
+
+        uriHelper.NavigateTo(uriHelper.Uri, forceLoad: true);
+    }
+}

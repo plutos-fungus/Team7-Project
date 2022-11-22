@@ -1,0 +1,50 @@
+﻿@inject HttpClient Http;
+@inject NavigationManager uriHelper;
+@using SurfsUpLibrary;
+
+<div class="modal fade show" id="myModal" style="display:block; background-color: rgba(10,10,10,.8);" aria-modal="true" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Delete Board</h4>
+                <button type="button" class="close" @onclick="@ModalCancel">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>@Board.Name</p>
+                <p>Are you sure you want to delete this board?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn" @onclick="@ModalCancel">Cancel</button>
+                <button type="button" class="btn btn-danger" @onclick=@ModalOk>Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public Surfboard Board { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> OnClose { get; set; }
+
+    private Task ModalCancel()
+    {
+        return OnClose.InvokeAsync(false);
+    }
+
+    private Task ModalOk()
+    {
+        ApiDeleteBoard();
+        return OnClose.InvokeAsync(true);
+    }
+
+    private async void ApiDeleteBoard()
+    {
+        HttpClient client = new HttpClient();
+        using HttpResponseMessage response = await client.DeleteAsync("https://localhost:7260/api/Surfboards/" + Board.ID);
+        response.EnsureSuccessStatusCode();
+
+        uriHelper.NavigateTo(uriHelper.Uri, forceLoad: true);
+    }
+}
