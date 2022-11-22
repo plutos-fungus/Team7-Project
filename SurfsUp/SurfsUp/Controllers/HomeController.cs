@@ -14,30 +14,52 @@ namespace SurfsUp.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
-        private readonly ApplicationDbContext _context;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly UserManager<IdentityUser> _userManager;
-
-        private readonly string APILinkRentalsV1 = @"https://localhost:7260/api/v1/Rentals";
-        private readonly string APILinkRentalsV2 = @"https://localhost:7260/api/v2/Rentals";
+        private HttpClient _client;
+        private readonly string APILinkRentalsV1 = @"https://localhost:7260/api/v1/Rentals/";
+        private readonly string APILinkRentalsV2 = @"https://localhost:7260/api/v2/Rentals/";
 
         private readonly string APILinkSurfboardsV1 = @"https://localhost:7260/api/v1/Surfboards/";
         private readonly string APILinkSurfboardsV2 = @"https://localhost:7260/api/v2/Surfboards/";
-
-        public HomeController(ILogger<HomeController> logger, ApplicationDbContext context, RoleManager<IdentityRole> roleManager, UserManager<IdentityUser> userManager)
+        
+        public HomeController(ILogger<HomeController> logger, RoleManager<IdentityRole> roleManager, UserManager<IdentityUser> userManager)
         {
             _logger = logger;
-            _context = context;
             _roleManager = roleManager;
             _userManager = userManager;
+            _client = new HttpClient();
+        }
 
+        public async Task<List<Surfboard>> ReturnSurfboardList(string APILink)
+        {
+            using HttpResponseMessage response = await _client.GetAsync(APILink);
+            response.EnsureSuccessStatusCode();
+            var jsonRespone = await response.Content.ReadAsStringAsync();
+            var options = new JsonSerializerOptions()
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            };
+            return JsonSerializer.Deserialize<List<Surfboard>>(jsonRespone, options);
+        }
+
+        public async Task<Surfboard> ReturnSurfboard(int? id, string APILink)
+        {
+            using HttpResponseMessage response = await _client.GetAsync(APILink + id);
+
+            response.EnsureSuccessStatusCode();
+
+            var jsonRespone = await response.Content.ReadAsStringAsync();
+            var options = new JsonSerializerOptions()
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            };
+            return JsonSerializer.Deserialize<Surfboard>(jsonRespone, options);
         }
 
         #region Works With API
         public async Task<IActionResult> Index(string SortOrder, string currentFilter, string searchString, int? pageNumber)
         {
-            HttpClient client = new HttpClient();
-
             bool userIsAuthenticated = HttpContext.User.Identity.IsAuthenticated;
             if (userIsAuthenticated)
             {
@@ -56,40 +78,33 @@ namespace SurfsUp.Controllers
                     searchString = currentFilter;
                 }
 
-                using HttpResponseMessage response = await client.GetAsync(APILinkSurfboardsV1);
-                response.EnsureSuccessStatusCode();
-                var jsonRespone = await response.Content.ReadAsStringAsync();
-                var options = new JsonSerializerOptions()
-                {
-                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-                };
-                var Surfboard = JsonSerializer.Deserialize<List<Surfboard>>(jsonRespone, options);
+                var Surfboard = await ReturnSurfboardList(APILinkSurfboardsV1);
 
-                var Hej = from s in Surfboard
-                          where s.IsRented == false
-                          select s;
+                var sort = from s in Surfboard
+                           where s.IsRented == false
+                           select s;
                 if (!String.IsNullOrEmpty(searchString))
                 {
-                    Hej = Hej.Where(s => s.Name.Contains(searchString));
+                    sort = sort.Where(s => s.Name.Contains(searchString));
                 }
 
                 switch (SortOrder)
                 {
                     case "name_desc":
-                        Hej = Hej.OrderBy(s => s.Name);
+                        sort = sort.OrderBy(s => s.Name);
                         break;
                     case "price_desc":
-                        Hej = Hej.OrderByDescending(s => s.Price);
+                        sort = sort.OrderByDescending(s => s.Price);
                         break;
                     case "BoardType_desc":
-                        Hej = Hej.OrderBy(s => s.BoardType);
+                        sort = sort.OrderBy(s => s.BoardType);
                         break;
                     default:
-                        Hej = Hej.OrderBy(s => s.Price);
+                        sort = sort.OrderBy(s => s.Price);
                         break;
                 }
                 int pageSize = 3;
-                return View(await PaginatedList<Surfboard>.CreateAsync(Hej, pageNumber ?? 1, pageSize));
+                return View(await PaginatedList<Surfboard>.CreateAsync(sort, pageNumber ?? 1, pageSize));
 
             }
             else
@@ -109,40 +124,33 @@ namespace SurfsUp.Controllers
                     searchString = currentFilter;
                 }
 
-                using HttpResponseMessage response = await client.GetAsync(APILinkSurfboardsV2);
-                response.EnsureSuccessStatusCode();
-                var jsonRespone = await response.Content.ReadAsStringAsync();
-                var options = new JsonSerializerOptions()
-                {
-                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-                };
-                var Surfboard = JsonSerializer.Deserialize<List<Surfboard>>(jsonRespone, options);
+                var Surfboard = await ReturnSurfboardList(APILinkSurfboardsV2);
 
-                var Hej = from s in Surfboard
-                          where s.IsRented == false && s.BoardType == Models.Surfboard.BoardTypes.shortboard
-                          select s;
+                var sort = from s in Surfboard
+                           where s.IsRented == false && s.BoardType == Models.Surfboard.BoardTypes.shortboard
+                           select s;
                 if (!String.IsNullOrEmpty(searchString))
                 {
-                    Hej = Hej.Where(s => s.Name.Contains(searchString));
+                    sort = sort.Where(s => s.Name.Contains(searchString));
                 }
 
                 switch (SortOrder)
                 {
                     case "name_desc":
-                        Hej = Hej.OrderBy(s => s.Name);
+                        sort = sort.OrderBy(s => s.Name);
                         break;
                     case "price_desc":
-                        Hej = Hej.OrderByDescending(s => s.Price);
+                        sort = sort.OrderByDescending(s => s.Price);
                         break;
                     case "BoardType_desc":
-                        Hej = Hej.OrderBy(s => s.BoardType);
+                        sort = sort.OrderBy(s => s.BoardType);
                         break;
                     default:
-                        Hej = Hej.OrderBy(s => s.Price);
+                        sort = sort.OrderBy(s => s.Price);
                         break;
                 }
                 int pageSize = 3;
-                return View(await PaginatedList<Surfboard>.CreateAsync(Hej, pageNumber ?? 1, pageSize));
+                return View(await PaginatedList<Surfboard>.CreateAsync(sort, pageNumber ?? 1, pageSize));
             }
         }
         #endregion
@@ -152,23 +160,28 @@ namespace SurfsUp.Controllers
             return View();
         }
 
+        public IActionResult NotLoggedIn()
+        {
+            return View();
+        }
+
         #region Works With API
         public async Task<IActionResult> Details(int? id)
         {
-            HttpClient client = new HttpClient();
-            using HttpResponseMessage response = await client.GetAsync(APILinkSurfboardsV1 + id);
-            response.EnsureSuccessStatusCode();
+            bool userIsAuthenticated = HttpContext.User.Identity.IsAuthenticated;
 
-            var jsonRespone = await response.Content.ReadAsStringAsync();
-
-            var options = new JsonSerializerOptions()
+            if (!userIsAuthenticated)
             {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-            };
-
-            var surfboard = JsonSerializer.Deserialize<Surfboard>(jsonRespone, options);
-
-            return View(surfboard);
+                try
+                {
+                    return View(await ReturnSurfboard(id, APILinkSurfboardsV2));
+                }
+                catch (Exception e)
+                {
+                    return RedirectToAction("NotLoggedIn");
+                }
+            }
+            return View(await ReturnSurfboard(id, APILinkSurfboardsV1));
         }
         #endregion
 
@@ -176,8 +189,7 @@ namespace SurfsUp.Controllers
         public async void CheckAndDelete()
         {
             DateTime nowDate = DateTime.Now;
-            HttpClient client = new HttpClient();
-            using HttpResponseMessage response = await client.GetAsync(APILinkRentalsV1);
+            using HttpResponseMessage response = await _client.GetAsync(APILinkRentalsV1);
             response.EnsureSuccessStatusCode();
 
             var jsonRespone = await response.Content.ReadAsStringAsync();
@@ -191,8 +203,7 @@ namespace SurfsUp.Controllers
 
             var rentCheck = rental.ToList();
 
-            client = new HttpClient();
-            using HttpResponseMessage surfResponse = await client.GetAsync(APILinkSurfboardsV1);
+            using HttpResponseMessage surfResponse = await _client.GetAsync(APILinkSurfboardsV1);
             surfResponse.EnsureSuccessStatusCode();
             var surfJsonRespone = await response.Content.ReadAsStringAsync();
             options = new JsonSerializerOptions()
@@ -203,10 +214,6 @@ namespace SurfsUp.Controllers
 
             var allSurfboards = Surfboard.Where(s => s.IsRented == true).ToList();
 
-            //DateTime nowDate = DateTime.Now;
-            //var rentCheck = _context.Rental.ToList();
-            //var allSurfboards = _context.Surfboard.Where(s => s.IsRented == true).ToList();
-
             foreach (Rental rent in rentCheck)
             {
                 if (rent.EndDate <= nowDate)
@@ -216,9 +223,8 @@ namespace SurfsUp.Controllers
                         if (rent.SurfboardID == surfboard.ID)
                         {
                             surfboard.IsRented = false;
-                            client = new HttpClient();
-                            using HttpResponseMessage tempResponse = await client.PutAsJsonAsync(APILinkRentalsV1 + rent.ID, rent);
-                            using HttpResponseMessage temp2Response = await client.PutAsJsonAsync(APILinkRentalsV1 + surfboard.ID, surfboard);
+                            using HttpResponseMessage tempResponse = await _client.PutAsJsonAsync(APILinkRentalsV1 + rent.ID, rent);
+                            using HttpResponseMessage temp2Response = await _client.PutAsJsonAsync(APILinkRentalsV1 + surfboard.ID, surfboard);
 
                             if (!tempResponse.IsSuccessStatusCode && !temp2Response.IsSuccessStatusCode)
                             {
@@ -227,7 +233,6 @@ namespace SurfsUp.Controllers
                         }
                     }
                 }
-
             }
         }
         #endregion

@@ -35,14 +35,19 @@ namespace SurfUpApi.Controllers.V2
         [HttpGet("{id}")]
         public async Task<ActionResult<Surfboard>> GetSurfboard(int id)
         {
-            var surfboard = await _context.Surfboard.FindAsync(id);
+            var surfboards = _context.Surfboard.ToList();
 
-            if (surfboard == null)
+            foreach (Surfboard s in surfboards)
             {
-                return NotFound();
+                if (s.ID == id)
+                {
+                    if (s.BoardType == Surfboard.BoardTypes.shortboard)
+                    {
+                        return s;
+                    }
+                }
             }
-
-            return surfboard;
+            return NotFound();
         }
 
         // PUT: api/Surfboards/5
