@@ -8,10 +8,11 @@ using Microsoft.EntityFrameworkCore;
 using SurfUpApi.Data;
 using SurfUpApi.Models;
 
-namespace SurfUpApi.Controllers
+namespace SurfUpApi.Controllers.V1
 {
-    [Route("api/[controller]")]
+    [Route("api/v{version:apiVersion}/[controller]")]
     [ApiController]
+    [ApiVersion("1.0")]
     public class SurfboardsController : ControllerBase
     {
         private readonly SurfUpApiContext _context;
@@ -22,6 +23,7 @@ namespace SurfUpApi.Controllers
         }
 
         // GET: api/Surfboards
+        [MapToApiVersion("1.0")]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Surfboard>>> GetSurfboard()
         {
@@ -29,6 +31,7 @@ namespace SurfUpApi.Controllers
         }
 
         // GET: api/Surfboards/5
+        [MapToApiVersion("1.0")]
         [HttpGet("{id}")]
         public async Task<ActionResult<Surfboard>> GetSurfboard(int id)
         {
@@ -44,6 +47,7 @@ namespace SurfUpApi.Controllers
 
         // PUT: api/Surfboards/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [MapToApiVersion("1.0")]
         [HttpPut("{id}")]
         public async Task<IActionResult> PutSurfboard(int id, Surfboard surfboard)
         {
@@ -75,6 +79,7 @@ namespace SurfUpApi.Controllers
 
         // POST: api/Surfboards
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [MapToApiVersion("1.0")]
         [HttpPost]
         public async Task<ActionResult<Surfboard>> PostSurfboard(Surfboard surfboard)
         {
@@ -85,6 +90,7 @@ namespace SurfUpApi.Controllers
         }
 
         // DELETE: api/Surfboards/5
+        [MapToApiVersion("1.0")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteSurfboard(int id)
         {

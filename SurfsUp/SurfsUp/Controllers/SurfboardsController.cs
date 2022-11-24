@@ -16,7 +16,7 @@ namespace SurfsUp.Controllers
     public class SurfboardsController : Controller
     {
         private HttpClient client;
-        private readonly string APILinkSurfboard = @"https://localhost:7260/api/Surfboards/";
+        private readonly string APILinkSurfboard = @"https://localhost:7260/api/v1/Surfboards/";
 
         public SurfboardsController()
         {
@@ -32,7 +32,6 @@ namespace SurfsUp.Controllers
                 link += id;
             }
 
-            HttpClient client = new HttpClient();
             using HttpResponseMessage response = await client.GetAsync(link);
             response.EnsureSuccessStatusCode();
             var jsonRespone = await response.Content.ReadAsStringAsync();
@@ -40,7 +39,7 @@ namespace SurfsUp.Controllers
             {
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase
             };
-            
+
             if (id == null)
             {
                 return JsonSerializer.Deserialize<List<Surfboard>>(jsonRespone, options);
@@ -101,8 +100,7 @@ namespace SurfsUp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("ID,Name,BoardType,Length,Width,Thickness,Volume,Price,EquipmentTypes,Image")] Surfboard surfboard)
         {
-            HttpClient client = new HttpClient();
-            using HttpResponseMessage response = await client.PostAsJsonAsync("https://localhost:7260/api/Surfboards/", surfboard);
+            using HttpResponseMessage response = await client.PostAsJsonAsync(APILinkSurfboard, surfboard);
             if (!response.IsSuccessStatusCode)
             {
                 return NotFound();
@@ -149,8 +147,7 @@ namespace SurfsUp.Controllers
                 return NotFound();
             }
 
-            HttpClient client = new HttpClient();
-            using HttpResponseMessage response = await client.PutAsJsonAsync("https://localhost:7260/api/Surfboards/" + id, surfboard);
+            using HttpResponseMessage response = await client.PutAsJsonAsync(APILinkSurfboard + id, surfboard);
 
             if (!response.IsSuccessStatusCode)
             {
@@ -202,7 +199,8 @@ namespace SurfsUp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            using HttpResponseMessage response = await client.DeleteAsync("https://localhost:7260/api/Surfboards/" + id);
+            using HttpResponseMessage response = await client.DeleteAsync(APILinkSurfboard + id);
+
             if (!response.IsSuccessStatusCode)
             {
                 return NotFound();

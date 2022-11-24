@@ -26,9 +26,9 @@ namespace SurfsUp.Controllers
         private readonly UserManager<IdentityUser> _userManager;
         private readonly SignInManager<IdentityUser> _signInManager;
         private HttpClient client;
-        private readonly string APILinkRental = @"https://localhost:7260/api/Rentals/";
-        private readonly string APILinkSurfboard = @"https://localhost:7260/api/Surfboards/";
-        private int RentalCount = 0;
+        private readonly string APILinkRental = @"https://localhost:7260/api/v1/Rentals/";
+        private readonly string APILinkSurfboard = @"https://localhost:7260/api/v1/Surfboards/";
+
 
         public RentalsController(SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager)
         {
@@ -239,7 +239,7 @@ namespace SurfsUp.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             // this code block requests to delete a rental
-            using HttpResponseMessage response = await client.DeleteAsync("https://localhost:7260/api/Rentals/" + id);
+            using HttpResponseMessage response = await client.DeleteAsync(APILinkRental + id);
             if (!response.IsSuccessStatusCode)
             {
                 return RedirectToAction("CanNotDelete");
