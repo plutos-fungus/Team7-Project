@@ -29,6 +29,7 @@ namespace SurfsUp.Controllers
         private readonly string APILinkRental = @"https://localhost:7260/api/v1/Rentals/";
         private readonly string APILinkSurfboard = @"https://localhost:7260/api/v1/Surfboards/";
 
+
         public RentalsController(SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager)
         {
             //_context = context;
@@ -139,19 +140,41 @@ namespace SurfsUp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("ID,EndDate,Email,SurfboardID")] Rental rental)
         {
-            using HttpResponseMessage response = await client.PostAsJsonAsync(APILinkRental, rental);
-            if (!response.IsSuccessStatusCode)
+            using HttpResponseMessage RentalResponse = await client.GetAsync(APILinkRental);
+            RentalResponse.EnsureSuccessStatusCode();
+            var jsonResponse = await RentalResponse.Content.ReadAsStringAsync();
+            var options = new JsonSerializerOptions()
             {
-                return RedirectToAction("CanNotRent");
-            }
-            var Surfboard = await ReturnSurfboardObject(rental.SurfboardID);
-            Surfboard.IsRented = true;
-            using HttpResponseMessage SurfboardPutResponse = await client.PutAsJsonAsync(APILinkSurfboard + Surfboard.ID, Surfboard);
-            if (!SurfboardPutResponse.IsSuccessStatusCode)
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            };
+            var rentals = JsonSerializer.Deserialize<List<Rental>>(jsonResponse, options);
+
+            foreach(Rental r in rentals) 
             {
-                return RedirectToAction("CanNotRent");
+                if(r.Email == rental.Email)
+                {
+                    RentalCount++;
+                }
             }
-            return Redirect("/Home/Index");
+            if(RentalCount < 3)
+            {
+                using HttpResponseMessage response = await client.PostAsJsonAsync(APILinkRental, rental);
+                if (!response.IsSuccessStatusCode)
+                {
+                    return RedirectToAction("CanNotRent");
+                }
+                var Surfboard = await ReturnSurfboardObject(rental.SurfboardID);
+                Surfboard.IsRented = true;
+                using HttpResponseMessage SurfboardPutResponse = await client.PutAsJsonAsync(APILinkSurfboard + Surfboard.ID, Surfboard);
+                if (!SurfboardPutResponse.IsSuccessStatusCode)
+                {
+                    return RedirectToAction("CanNotRent");
+                }
+                return Redirect("/Home/Index");
+            } 
+            return RedirectToAction("CanNotRent");
+                
+
         }
         #endregion
 

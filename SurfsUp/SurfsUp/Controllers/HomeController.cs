@@ -50,10 +50,12 @@ namespace SurfsUp.Controllers
             response.EnsureSuccessStatusCode();
 
             var jsonRespone = await response.Content.ReadAsStringAsync();
+
             var options = new JsonSerializerOptions()
             {
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase
             };
+
             return JsonSerializer.Deserialize<Surfboard>(jsonRespone, options);
         }
 
@@ -83,6 +85,7 @@ namespace SurfsUp.Controllers
                 var sort = from s in Surfboard
                            where s.IsRented == false
                            select s;
+
                 if (!String.IsNullOrEmpty(searchString))
                 {
                     sort = sort.Where(s => s.Name.Contains(searchString));
@@ -129,6 +132,7 @@ namespace SurfsUp.Controllers
                 var sort = from s in Surfboard
                            where s.IsRented == false && s.BoardType == Models.Surfboard.BoardTypes.shortboard
                            select s;
+
                 if (!String.IsNullOrEmpty(searchString))
                 {
                     sort = sort.Where(s => s.Name.Contains(searchString));
@@ -161,6 +165,7 @@ namespace SurfsUp.Controllers
         }
 
         public IActionResult NotLoggedIn()
+
         {
             return View();
         }
@@ -182,6 +187,7 @@ namespace SurfsUp.Controllers
                 }
             }
             return View(await ReturnSurfboard(id, APILinkSurfboardsV1));
+
         }
         #endregion
 

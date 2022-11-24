@@ -200,6 +200,7 @@ namespace SurfsUp.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             using HttpResponseMessage response = await client.DeleteAsync(APILinkSurfboard + id);
+
             if (!response.IsSuccessStatusCode)
             {
                 return NotFound();
