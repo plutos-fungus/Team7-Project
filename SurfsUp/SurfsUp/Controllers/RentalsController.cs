@@ -140,6 +140,7 @@ namespace SurfsUp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("ID,EndDate,Email,SurfboardID")] Rental rental)
         {
+            int RentalCount = 0;
             using HttpResponseMessage RentalResponse = await client.GetAsync(APILinkRental);
             RentalResponse.EnsureSuccessStatusCode();
             var jsonResponse = await RentalResponse.Content.ReadAsStringAsync();
@@ -148,15 +149,15 @@ namespace SurfsUp.Controllers
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase
             };
             var rentals = JsonSerializer.Deserialize<List<Rental>>(jsonResponse, options);
-
-            foreach(Rental r in rentals) 
+            
+            foreach (Rental r in rentals)
             {
-                if(r.Email == rental.Email)
+                if (r.Email == rental.Email)
                 {
                     RentalCount++;
                 }
             }
-            if(RentalCount < 3)
+            if (RentalCount < 3)
             {
                 using HttpResponseMessage response = await client.PostAsJsonAsync(APILinkRental, rental);
                 if (!response.IsSuccessStatusCode)
@@ -171,9 +172,9 @@ namespace SurfsUp.Controllers
                     return RedirectToAction("CanNotRent");
                 }
                 return Redirect("/Home/Index");
-            } 
+            }
             return RedirectToAction("CanNotRent");
-                
+
 
         }
         #endregion
