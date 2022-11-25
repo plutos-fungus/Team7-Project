@@ -1,0 +1,147 @@
+﻿@page "/RentalsPage"
+@using SurfsUpLibrary;
+@using SurfsUpBlazorSite.Client.Components;
+@using System.Text.Json
+@inject HttpClient Http
+<PageTitle>Rentals</PageTitle>
+<AuthorizeView>
+    <Authorized>
+        <h1>Rentals</h1>
+
+        <button type="button" class="btn btn-danger btn-sm" @onclick="OpenWeatherForecastDialog">Weather Forecast</button>
+        <div class="text-center">
+            @if(rentals == null)
+            {
+                <p><em>Loading...</em></p>
+            }
+            else
+            {
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>
+                                <a>Name</a>
+                            </th>
+                            <th>
+                                <a>RentalDate</a>
+                            </th>
+                            <th>
+                                <a>Email</a>
+                            </th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (Rental r in rentals)
+                        {
+                            @foreach (Surfboard s in boards)
+                            {
+                                @if(s.ID == r.SurfboardID)
+                                {
+                                    <tr>
+                                        <td>
+                                            @s.Name
+                                        </td>
+                                        <td>
+                                            @r.EndDate
+                                        </td>
+                                        <td>
+                                            @r.Email
+                                        </td>
+                                        <td>
+                                            @*<a asp-action="Edit" asp-route-id="@item.ID">Edit</a> |
+                                            <a asp-action="Details" asp-route-id="@item.ID">Details</a> |
+                                            <a asp-action="Delete" asp-route-id="@item.ID">Delete</a>*@
+                                            <button type="button" class="btn btn-danger btn-sm" @onclick="() => OpenDeleteRentalDialog(r)">Delete</button>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
+        @if (DeleteRentalDialogOpen)
+        {
+            <DeleteRentalDialog Rent="@rental" OnClose="OnDeleteRentalDialogClose"></DeleteRentalDialog>
+        }
+        @if (WeatherForecastDialogOpen)
+        {
+            <WeatherForecast OnClose="@OnWeatherForecastDialogClose"></WeatherForecast>
+        }
+    </Authorized>
+    <NotAuthorized>
+        <p>Please Log in</p>
+    </NotAuthorized>
+</AuthorizeView>
+@code {
+    private List<Surfboard> boards;
+    private Rental rental;
+    private List<Rental>? rentals;
+    public string SearchString = String.Empty;
+    List<string> options = new List<string>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        using HttpResponseMessage response = await Http.GetAsync("https://localhost:7260/api/Rentals/");
+        response.EnsureSuccessStatusCode();
+        var jsonRespone = await response.Content.ReadAsStringAsync();
+        var options = new JsonSerializerOptions()
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            };
+        var Rentals = JsonSerializer.Deserialize<List<Rental>>(jsonRespone, options);
+        rentals = Rentals;
+        //options = rentals.Select(s => s.Name).Distinct().ToList();
+        using HttpResponseMessage SurfboardResponse = await Http.GetAsync("https://localhost:7260/api/Surfboards/");
+        response.EnsureSuccessStatusCode();
+        jsonRespone = await SurfboardResponse.Content.ReadAsStringAsync();
+        options = new JsonSerializerOptions()
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            };
+        var Surfboards = JsonSerializer.Deserialize<List<Surfboard>>(jsonRespone, options);
+        boards = Surfboards;
+    }
+    public bool EditRentalDialogOpen { get; set; }
+
+    private void OnEditRentalDialogClose(bool accepted)
+    {
+        EditRentalDialogOpen = false;
+        StateHasChanged();
+    }
+    private void OpenEditRentalDialog(Rental rent)
+    {
+        rental = rent;
+        EditRentalDialogOpen = true;
+        StateHasChanged();
+    }
+
+    public bool DeleteRentalDialogOpen { get; set; }
+
+    private void OnDeleteRentalDialogClose(bool accepted)
+    {
+        DeleteRentalDialogOpen = false;
+        StateHasChanged();
+    }
+    private void OpenDeleteRentalDialog(Rental rent)
+    {
+        rental = rent;
+        DeleteRentalDialogOpen = true;
+        StateHasChanged();
+    }
+
+    public bool WeatherForecastDialogOpen { get; set; }
+
+    private void OnWeatherForecastDialogClose(bool accepted)
+    {
+        WeatherForecastDialogOpen = false;
+        StateHasChanged();
+    }
+    private void OpenWeatherForecastDialog()
+    {
+        WeatherForecastDialogOpen = true;
+        StateHasChanged();
+    }
+}

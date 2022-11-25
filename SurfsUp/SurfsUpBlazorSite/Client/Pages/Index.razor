@@ -1,0 +1,154 @@
+﻿@page "/"
+@using SurfsUpLibrary;
+@using System.Text.Json
+@using SurfsUpBlazorSite.Client.Components;
+@inject HttpClient Http
+<PageTitle>Home</PageTitle>
+
+<h1>Surfs up</h1>
+
+<button type="button" class="btn btn-danger btn-sm" @onclick="OpenWeatherForecastDialog">Weather Forecast</button>
+<div class="text-center">
+    @if (surfboards == null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else
+    {
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>
+                        <a>Name</a>
+                    </th>
+                    <th>
+                        <a>BoardType</a>
+                    </th>
+                    <th>
+                        <a>Price</a>
+                    </th>
+                    <th>
+                        Image
+                    </th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <AuthorizeView>
+                    <Authorized>
+                        @foreach (Surfboard s in surfboards)
+                        {
+                            <tr>
+                                <td>
+                                    @s.Name
+                                </td>
+                                <td>
+                                    @s.BoardType
+                                </td>
+                                <td>
+                                    @s.Price
+                                </td>
+                                <td>
+                                    @if (s.Image != "")
+                                    {
+                                        <img src="@s.Image" style="width: 150px" alt="ImageNotFound" />
+                                    }
+                                </td>
+                                <td>
+                                    @*<a href="@Url.Action("Create", "Rentals", new { id = item.ID})">Rent</a> |
+                            <a asp-action="Details" asp-route-id="@item.ID">Details</a>*@
+                                    <button type="button" class="btn btn-danger btn-sm" @onclick="() => OpenRentDialog(s)">Rent</button>
+                                </td>
+                            </tr>
+                        }
+                    </Authorized>
+                    <NotAuthorized>
+                        @foreach (Surfboard s in shortboards)
+                        {
+                            <tr>
+                                <td>
+                                    @s.Name
+                                </td>
+                                <td>
+                                    @s.BoardType
+                                </td>
+                                <td>
+                                    @s.Price
+                                </td>
+                                <td>
+                                    @if (s.Image != "")
+                                    {
+                                        <img src="@s.Image" style="width: 150px" alt="ImageNotFound" />
+                                    }
+                                </td>
+                                <td>
+                                    @*<a href="@Url.Action("Create", "Rentals", new { id = item.ID})">Rent</a> |
+                            <a asp-action="Details" asp-route-id="@item.ID">Details</a>*@
+                                    <button type="button" class="btn btn-danger btn-sm" @onclick="() => OpenRentDialog(s)">Rent</button>
+                                </td>
+                            </tr>
+                        }
+                    </NotAuthorized>
+                </AuthorizeView>
+            </tbody>
+        </table>
+    }
+</div>
+@if (RentDialogOpen)
+{
+    <RentDialog Title="Surfboard" Text="Her the information will be" Board="@board" OnClose="@OnRentDialogClose"></RentDialog>
+}
+@if (WeatherForecastDialogOpen)
+{
+    <WeatherForecast OnClose="@OnWeatherForecastDialogClose"></WeatherForecast>
+}
+
+@code {
+    private List<Surfboard>? surfboards;
+    private List<Surfboard>? shortboards;
+    private Surfboard board;
+    public string SearchString = String.Empty;
+    List<string> options = new List<string>();
+
+    public bool RentDialogOpen { get; set; }
+
+    private void OnRentDialogClose(bool accepted)
+    {
+        RentDialogOpen = false;
+        StateHasChanged();
+    }
+    private void OpenRentDialog(Surfboard surfboard)
+    {
+        board = surfboard;
+        RentDialogOpen = true;
+        StateHasChanged();
+    }
+
+    public bool WeatherForecastDialogOpen { get; set; }
+
+    private void OnWeatherForecastDialogClose(bool accepted){
+        WeatherForecastDialogOpen = false;
+        StateHasChanged();
+    }
+    private void OpenWeatherForecastDialog(){
+        WeatherForecastDialogOpen = true;
+        StateHasChanged();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using HttpResponseMessage response = await Http.GetAsync("https://localhost:7260/api/Surfboards/");
+        response.EnsureSuccessStatusCode();
+        var jsonRespone = await response.Content.ReadAsStringAsync();
+        var options = new JsonSerializerOptions()
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            };
+        var Surfboards = JsonSerializer.Deserialize<List<Surfboard>>(jsonRespone, options);
+        surfboards = Surfboards.Where(s => s.IsRented == false).ToList();
+        shortboards = surfboards.Where(s => s.BoardType == Surfboard.BoardTypes.shortboard).ToList();
+
+
+        //options = surfboards.Select(s => s.Name).Distinct().ToList();
+    }
+}
