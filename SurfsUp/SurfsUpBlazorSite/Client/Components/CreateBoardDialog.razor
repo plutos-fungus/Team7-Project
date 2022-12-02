@@ -58,6 +58,9 @@
 
 @code {
     public Surfboard Board { get; set; } = new Surfboard();
+    private readonly string _APISurfboardLink = @"https://localhost:7260/api/v1/Surfboards/";
+    private readonly string _APILinkRental = @"https://localhost:7260/api/v1/Rentals/";
+
 
     [Parameter]
     public EventCallback<bool> OnClose { get; set; }
@@ -77,7 +80,7 @@
     private async void ApiCallCreateBoard()
     {
         HttpClient client = new HttpClient();
-        using HttpResponseMessage response = await client.PostAsJsonAsync("https://localhost:7260/api/Surfboards/", Board);
+        using HttpResponseMessage response = await client.PostAsJsonAsync(_APISurfboardLink, Board);
         response.EnsureSuccessStatusCode();
 
         uriHelper.NavigateTo(uriHelper.Uri, forceLoad: true);

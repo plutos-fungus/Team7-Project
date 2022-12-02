@@ -24,6 +24,8 @@
 @code {
     [Parameter]
     public Surfboard Board { get; set; }
+    private readonly string _APISurfboardLink = @"https://localhost:7260/api/v1/Surfboards/";
+    private readonly string _APILinkRental = @"https://localhost:7260/api/v1/Rentals/";
 
     [Parameter]
     public EventCallback<bool> OnClose { get; set; }
@@ -42,7 +44,7 @@
     private async void ApiDeleteBoard()
     {
         HttpClient client = new HttpClient();
-        using HttpResponseMessage response = await client.DeleteAsync("https://localhost:7260/api/Surfboards/" + Board.ID);
+        using HttpResponseMessage response = await client.DeleteAsync(_APISurfboardLink + Board.ID);
         response.EnsureSuccessStatusCode();
 
         uriHelper.NavigateTo(uriHelper.Uri, forceLoad: true);

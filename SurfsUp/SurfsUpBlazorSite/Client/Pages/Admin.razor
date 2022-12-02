@@ -102,6 +102,9 @@
 
 
 @code {
+    private readonly string _APISurfboardLink = @"https://localhost:7260/api/v1/Surfboards/";
+    private readonly string _APILinkRental = @"https://localhost:7260/api/v1/Rentals/";
+
     private List<Surfboard>? surfboards;
     private Surfboard board;
     public string SearchString = String.Empty;
@@ -150,7 +153,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        using HttpResponseMessage response = await Http.GetAsync("https://localhost:7260/api/Surfboards/");
+        using HttpResponseMessage response = await Http.GetAsync(_APISurfboardLink);
         response.EnsureSuccessStatusCode();
         var jsonRespone = await response.Content.ReadAsStringAsync();
         var options = new JsonSerializerOptions()

@@ -5,26 +5,21 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using SurfsUp.Areas.Identity.Data;
+using SurfUpApi.Data;
 
 #nullable disable
 
-namespace SurfsUp.Migrations
+namespace SurfUpApi.Migrations
 {
-    [DbContext(typeof(ApplicationDbContext))]
-<<<<<<<< HEAD:SurfsUp/SurfsUp/Migrations/20220930071007_migration4.Designer.cs
-    [Migration("20220930071007_migration4")]
-    partial class migration4
-========
-    [Migration("20221202083702_Migration1")]
-    partial class Migration1
->>>>>>>> main:SurfsUp/SurfsUp/Migrations/20221202083702_Migration1.Designer.cs
+    [DbContext(typeof(SurfUpApiContext))]
+    [Migration("20221202101051_BlazorMigration")]
+    partial class BlazorMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "6.0.9")
+                .HasAnnotation("ProductVersion", "6.0.10")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
@@ -227,10 +222,13 @@ namespace SurfsUp.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("SurfsUp.Models.Rental", b =>
+            modelBuilder.Entity("SurfUpApi.Models.Rental", b =>
                 {
                     b.Property<int>("ID")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"), 1L, 1);
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -248,7 +246,7 @@ namespace SurfsUp.Migrations
                     b.ToTable("Rental");
                 });
 
-            modelBuilder.Entity("SurfsUp.Models.Surfboard", b =>
+            modelBuilder.Entity("SurfUpApi.Models.Surfboard", b =>
                 {
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd()
@@ -283,12 +281,6 @@ namespace SurfsUp.Migrations
 
                     b.Property<double>("Price")
                         .HasColumnType("float");
-
-                    b.Property<byte[]>("RowVersion")
-                        .IsConcurrencyToken()
-                        .IsRequired()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("rowversion");
 
                     b.Property<double>("Thickness")
                         .HasColumnType("float");
@@ -357,7 +349,7 @@ namespace SurfsUp.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("SurfsUp.Models.Surfboard", b =>
+            modelBuilder.Entity("SurfUpApi.Models.Surfboard", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "IdentityUser")
                         .WithMany()

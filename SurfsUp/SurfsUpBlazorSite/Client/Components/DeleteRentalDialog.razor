@@ -27,6 +27,9 @@
     [Parameter]
     public Rental Rent { get; set; }
 
+    private readonly string _APISurfboardLink = @"https://localhost:7260/api/v1/Surfboards/";
+    private readonly string _APILinkRental = @"https://localhost:7260/api/v1/Rentals/";
+
     [Parameter]
     public EventCallback<bool> OnClose { get; set; }
 
@@ -44,10 +47,10 @@
     private async void ApiDeleteRent()
     {
         HttpClient client = new HttpClient();
-        using HttpResponseMessage response = await client.DeleteAsync("https://localhost:7260/api/Rentals/" + Rent.ID);
+        using HttpResponseMessage response = await client.DeleteAsync(_APILinkRental + Rent.ID);
         response.EnsureSuccessStatusCode();
 
-        using HttpResponseMessage SurfboardResponse = await Http.GetAsync("https://localhost:7260/api/Surfboards/" + Rent.SurfboardID);
+        using HttpResponseMessage SurfboardResponse = await Http.GetAsync(_APISurfboardLink + Rent.SurfboardID);
 
         SurfboardResponse.EnsureSuccessStatusCode();
 
@@ -62,7 +65,7 @@
 
         Surfboard.IsRented = false;
 
-        using HttpResponseMessage SurfboardPutResponse = await Http.PutAsJsonAsync("https://localhost:7260/api/Surfboards/" + Surfboard.ID, Surfboard);
+        using HttpResponseMessage SurfboardPutResponse = await Http.PutAsJsonAsync(_APISurfboardLink + Surfboard.ID, Surfboard);
 
         SurfboardPutResponse.EnsureSuccessStatusCode();
 

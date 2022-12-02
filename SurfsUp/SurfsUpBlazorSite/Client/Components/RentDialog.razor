@@ -54,6 +54,9 @@
 </div>
 
 @code {
+    private readonly string _APISurfboardLink = @"https://localhost:7260/api/v1/Surfboards/";
+    private readonly string _APILinkRental = @"https://localhost:7260/api/v1/Rentals/";
+
     [Parameter]
     public string Title { get; set; }
 
@@ -86,11 +89,11 @@
         rental.EndDate = endDate;
         rental.Email = email;
         rental.SurfboardID = Board.ID;
-        using HttpResponseMessage response = await Http.PostAsJsonAsync("https://localhost:7260/api/Rentals/", rental);
+        using HttpResponseMessage response = await Http.PostAsJsonAsync(_APILinkRental, rental);
 
         response.EnsureSuccessStatusCode();
 
-        using HttpResponseMessage SurfboardResponse = await Http.GetAsync("https://localhost:7260/api/Surfboards/" + rental.SurfboardID);
+        using HttpResponseMessage SurfboardResponse = await Http.GetAsync(_APISurfboardLink + rental.SurfboardID);
 
         SurfboardResponse.EnsureSuccessStatusCode();
 
@@ -105,7 +108,7 @@
 
         Surfboard.IsRented = true;
 
-        using HttpResponseMessage SurfboardPutResponse = await Http.PutAsJsonAsync("https://localhost:7260/api/Surfboards/" + Surfboard.ID, Surfboard);
+        using HttpResponseMessage SurfboardPutResponse = await Http.PutAsJsonAsync(_APISurfboardLink + Surfboard.ID, Surfboard);
 
         SurfboardPutResponse.EnsureSuccessStatusCode();
 

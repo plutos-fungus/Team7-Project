@@ -76,6 +76,9 @@
     </NotAuthorized>
 </AuthorizeView>
 @code {
+    private readonly string _APISurfboardLink = @"https://localhost:7260/api/v1/Surfboards/";
+    private readonly string _APILinkRental = @"https://localhost:7260/api/v1/Rentals/";
+
     private List<Surfboard> boards;
     private Rental rental;
     private List<Rental>? rentals;
@@ -84,7 +87,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        using HttpResponseMessage response = await Http.GetAsync("https://localhost:7260/api/Rentals/");
+        using HttpResponseMessage response = await Http.GetAsync(_APILinkRental);
         response.EnsureSuccessStatusCode();
         var jsonRespone = await response.Content.ReadAsStringAsync();
         var options = new JsonSerializerOptions()
@@ -94,7 +97,7 @@
         var Rentals = JsonSerializer.Deserialize<List<Rental>>(jsonRespone, options);
         rentals = Rentals;
         //options = rentals.Select(s => s.Name).Distinct().ToList();
-        using HttpResponseMessage SurfboardResponse = await Http.GetAsync("https://localhost:7260/api/Surfboards/");
+        using HttpResponseMessage SurfboardResponse = await Http.GetAsync(_APISurfboardLink);
         response.EnsureSuccessStatusCode();
         jsonRespone = await SurfboardResponse.Content.ReadAsStringAsync();
         options = new JsonSerializerOptions()

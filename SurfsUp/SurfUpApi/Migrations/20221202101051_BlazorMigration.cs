@@ -2,9 +2,9 @@
 
 #nullable disable
 
-namespace SurfsUp.Migrations
+namespace SurfUpApi.Migrations
 {
-    public partial class migration6 : Migration
+    public partial class BlazorMigration : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
