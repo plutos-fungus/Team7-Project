@@ -17,11 +17,23 @@
                 <input asp-for="EndDate" class="form-control" />
                 <span asp-validation-for="EndDate" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="Email" class="control-label required-field"></label>
-                <input asp-for="Email" class="form-control" />
-                <span asp-validation-for="Email" class="text-danger"></span>
-            </div>
+            @if (User.Identity.IsAuthenticated)
+            {
+                <div class="form-group" hidden>
+                    <label asp-for="Email" class="control-label required-field"></label>
+                    <input asp-for="Email" value="@User.Identity.Name" class="form-control" />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+            }
+            else
+            {
+                <div class="form-group">
+                    <label asp-for="Email" class="control-label required-field"></label>
+                    <input asp-for="Email" class="form-control" />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+            }
+            
             <div class="form-group" hidden>
                 <label asp-for="SurfboardID" class="control-label"></label>
                 <input asp-for="SurfboardID" class="form-control" />

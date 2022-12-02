@@ -12,8 +12,13 @@ using SurfsUp.Areas.Identity.Data;
 namespace SurfsUp.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20220930070935_migration3")]
-    partial class migration3
+<<<<<<<< HEAD:SurfsUp/SurfsUp/Migrations/20220930071007_migration4.Designer.cs
+    [Migration("20220930071007_migration4")]
+    partial class migration4
+========
+    [Migration("20221202083702_Migration1")]
+    partial class Migration1
+>>>>>>>> main:SurfsUp/SurfsUp/Migrations/20221202083702_Migration1.Designer.cs
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -233,12 +238,6 @@ namespace SurfsUp.Migrations
                         .HasColumnType("nvarchar(255)");
 
                     b.Property<DateTime>("EndDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("RentalDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("SurfboardID")
