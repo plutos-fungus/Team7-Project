@@ -12,8 +12,8 @@ using SurfsUp.Areas.Identity.Data;
 namespace SurfsUp.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20221111081021_InitialMigration")]
-    partial class InitialMigration
+    [Migration("20221202083702_Migration1")]
+    partial class Migration1
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -234,12 +234,6 @@ namespace SurfsUp.Migrations
 
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<byte[]>("RowVersion")
-                        .IsConcurrencyToken()
-                        .IsRequired()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("rowversion");
 
                     b.Property<int>("SurfboardID")
                         .HasColumnType("int");
