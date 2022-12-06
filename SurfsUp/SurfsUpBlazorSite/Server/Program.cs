@@ -19,7 +19,8 @@ builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.R
 builder.Services.AddIdentityServer()
     .AddApiAuthorization<ApplicationUser, ApplicationDbContext>();
 
-
+builder.Services.AddAuthorization(options => options.AddPolicy("RequiredAdminRole", policy => policy.RequireRole("Admin")));
+builder.Services.AddAuthorization(options => options.AddPolicy("RequiredUserRole", policy => policy.RequireRole("User")));
 
 builder.Services.AddAuthentication()
     .AddIdentityServerJwt();

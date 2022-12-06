@@ -4,6 +4,7 @@
 @using SurfsUpBlazorSite.Client.Components;
 @using System.Text.Json
 @inject HttpClient Http
+@attribute [Authorize(Roles = "Admin")]
 <PageTitle>Admin</PageTitle>
 
 <h1>Admin</h1>
