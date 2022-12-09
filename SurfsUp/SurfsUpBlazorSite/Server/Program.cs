@@ -4,6 +4,9 @@ using Microsoft.EntityFrameworkCore;
 using SurfsUpBlazorSite.Server.Data;
 using SurfsUpBlazorSite.Server.Models;
 using Microsoft.AspNetCore.Identity;
+using BlazorServerSignalRApp.Server.Hubs;
+using Microsoft.AspNetCore.Components.Authorization;
+using SurfsUpBlazorSite.Server.Areas.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,13 +25,24 @@ builder.Services.AddIdentityServer()
 builder.Services.AddAuthorization(options => options.AddPolicy("RequiredAdminRole", policy => policy.RequireRole("Admin")));
 builder.Services.AddAuthorization(options => options.AddPolicy("RequiredUserRole", policy => policy.RequireRole("User")));
 
+builder.Services.AddSignalR();
+builder.Services.AddResponseCompression(opts =>
+{
+    opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
+        new[] { "application/octet-stream" });
+});
+builder.Services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<IdentityUser>>();
+
 builder.Services.AddAuthentication()
     .AddIdentityServerJwt();
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
+builder.Services.AddApiAuthorization();
 
 var app = builder.Build();
+
+app.UseResponseCompression();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -58,5 +72,7 @@ app.UseAuthorization();
 app.MapRazorPages();
 app.MapControllers();
 app.MapFallbackToFile("index.html");
+app.MapHub<ChatHub>("/chathub");
+//app.MapFallbackToPage("/_Host");
 
 app.Run();
